@@ -1,21 +1,24 @@
 import { anthropic } from '@ai-sdk/anthropic';
-import { openai } from '@ai-sdk/openai';
-import { streamText, LanguageModelV1 } from 'ai';
+import { createOpenAI, openai } from '@ai-sdk/openai';
+import { streamText, LanguageModel } from 'ai';
 import { createClient } from '@/utils/supabase/server';
 import { saveMessage, getOrCreateChat } from '@/utils/supabase/chat';
 
 export const maxDuration = 60;
 
-function resolveAiModel(modelPref: string = 'openai'): LanguageModelV1 {
+function resolveAiModel(modelPref: string = 'openai'): LanguageModel {
   const localUrl = process.env.LOCAL_AI_URL || 'http://localhost:1234/v1';
   
   switch (modelPref) {
     case 'anthropic':
       return anthropic('claude-3-5-sonnet-latest');
-    case 'local':
-      return openai('local-model-id', {
+    case 'local': {
+      const localAi = createOpenAI({
         baseURL: localUrl,
+        apiKey: 'not-needed', // Local models often don't need real keys
       });
+      return localAi('local-model-id');
+    }
     case 'openai':
     default:
       return openai('gpt-4o');
@@ -31,7 +34,7 @@ export async function POST(req: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const model = resolveAiModel(modelPref || process.env.AI_MODEL_PREFERENCE);
+  const model = resolveAiModel(modelPref || (process.env.AI_MODEL_PREFERENCE as string));
 
   // Get or create the chat session
   const chatId = await getOrCreateChat(personaId, user.id);
@@ -55,4 +58,5 @@ export async function POST(req: Request) {
 
   return result.toDataStreamResponse();
 }
+
 
