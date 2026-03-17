@@ -1,18 +1,21 @@
 import { anthropic } from '@ai-sdk/anthropic';
 import { openai } from '@ai-sdk/openai';
 import { streamText, LanguageModelV1 } from 'ai';
+import { createClient } from '@/utils/supabase/server';
+import { saveMessage, getOrCreateChat } from '@/utils/supabase/chat';
 
-export const maxDuration = 60; // Allow longer responses
+export const maxDuration = 60;
 
-// Helper function to resolve the correct AI provider based on environment/settings
 function resolveAiModel(modelPref: string = 'openai'): LanguageModelV1 {
+  const localUrl = process.env.LOCAL_AI_URL || 'http://localhost:1234/v1';
+  
   switch (modelPref) {
     case 'anthropic':
       return anthropic('claude-3-5-sonnet-latest');
     case 'local':
-      // Local models don't use standard providers in the same way, but as an example using an OpenAI-compatible local AI like LM Studio
-      // Make sure to set `OPENAI_BASE_URL` in .env to http://localhost:1234/v1 or similar where local AI is running.
-      return openai('local-model-id');
+      return openai('local-model-id', {
+        baseURL: localUrl,
+      });
     case 'openai':
     default:
       return openai('gpt-4o');
@@ -20,18 +23,36 @@ function resolveAiModel(modelPref: string = 'openai'): LanguageModelV1 {
 }
 
 export async function POST(req: Request) {
-  const { messages, systemPrompt, modelPref } = await req.json();
+  const { messages, systemPrompt, modelPref, personaId } = await req.json();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // In production, you would fetch model preference from the user's database settings.
-  // We pass it in from the client-side for now.
-  const model = resolveAiModel(modelPref);
+  if (!user) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const model = resolveAiModel(modelPref || process.env.AI_MODEL_PREFERENCE);
+
+  // Get or create the chat session
+  const chatId = await getOrCreateChat(personaId, user.id);
+
+  // Save the user's latest message
+  const lastUserMessage = messages[messages.length - 1];
+  if (lastUserMessage && lastUserMessage.role === 'user') {
+    await saveMessage(chatId, 'user', lastUserMessage.content);
+  }
 
   const result = streamText({
     model,
     messages,
-    system: systemPrompt, // This contains the deceased's persona details
-    temperature: 0.7,     // Keep responses creative but grounded
+    system: systemPrompt,
+    temperature: 0.7,
+    onFinish: async (event) => {
+      // Save the assistant's response when finished
+      await saveMessage(chatId, 'assistant', event.text);
+    }
   });
 
   return result.toDataStreamResponse();
 }
+
