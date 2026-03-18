@@ -83,7 +83,8 @@ export const translations = {
       createTitle: 'Want to memorialize a loved one?',
       createSubtitle: 'Create an AI persona to keep their memories alive and allow you to always talk with them.',
       createBtn: 'Create Profile Now',
-      backToDashboard: 'Back to my dashboard'
+      backToDashboard: 'Back to my dashboard',
+      searchPlaceholder: 'Search memorials...'
     },
     memorial: {
       backToDashboard: 'Back to Dashboard',
@@ -196,7 +197,8 @@ export const translations = {
       createTitle: 'רוצים להנציח אדם אהוב?',
       createSubtitle: 'צרו אישיות AI שתשמור על זיכרונותיהם חים ותאפשר לכם לשוחח איתם תמיד.',
       createBtn: 'בנה פרופיל עכשיו',
-      backToDashboard: 'חזרה ללוח הבקרה שלי'
+      backToDashboard: 'חזרה ללוח הבקרה שלי',
+      searchPlaceholder: 'חיפוש דפי זיכרון...'
     },
     memorial: {
       backToDashboard: 'חזרה ללוח הבקרה',
