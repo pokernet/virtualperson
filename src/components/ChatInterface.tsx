@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
 import Link from 'next/link';
+import { useLanguage } from '@/utils/i18n/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 // Define Message type since we can't get it from ai/react easily
 export interface Message {
@@ -26,6 +28,7 @@ export default function ChatInterface({
   systemPrompt, 
   initialMessages = [] 
 }: ChatInterfaceProps) {
+  const { t, isRTL } = useLanguage();
   const [isVisualizing, setIsVisualizing] = useState(false);
   const [input, setInput] = useState('');
   
@@ -41,7 +44,7 @@ export default function ChatInterface({
       {
         id: 'welcome-msg',
         role: 'assistant',
-        content: `Hello. I am here. It's good to talk to you.`
+        content: t('chat.welcomeMsg')
       }
     ]) as any
   });
@@ -92,7 +95,7 @@ export default function ChatInterface({
           {
             id: `visualization-${Date.now()}`,
             role: 'assistant',
-            content: `Here is a visualization of that memory:\n\n![Memory Visualization](${data.imageUrl})`
+            content: `${t('chat.visualizationSent')}\n\n![Memory Visualization](${data.imageUrl})`
           }
         ]);
       }
@@ -134,7 +137,7 @@ export default function ChatInterface({
       parts.push(<span key={lastIdx} style={{ whiteSpace: 'pre-wrap' }}>{content.slice(lastIdx)}</span>);
     }
     
-    if (parts.length === 0) return <span style={{ whiteSpace: 'pre-wrap' }}>{content}</span>;
+    if (parts.length === 0) return <span style={{ whiteSpace: 'pre-wrap', textAlign: 'inherit' }}>{content}</span>;
     return <>{parts}</>;
   };
 
@@ -146,7 +149,8 @@ export default function ChatInterface({
       padding: '2rem',
       maxWidth: '1200px',
       margin: '0 auto',
-      gap: '2rem'
+      gap: '2rem',
+      direction: isRTL ? 'rtl' : 'ltr'
     }}>
       <header style={{
         display: 'flex',
@@ -154,9 +158,10 @@ export default function ChatInterface({
         alignItems: 'center',
         padding: '1rem 0.5rem 1.5rem 0.5rem',
         borderBottom: '1px solid var(--border-color)',
-        marginBottom: '1rem'
+        marginBottom: '1rem',
+        flexDirection: isRTL ? 'row-reverse' : 'row'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
           <Link href="/dashboard" style={{ 
             color: 'var(--text-secondary)', 
             fontSize: '1.25rem',
@@ -168,56 +173,59 @@ export default function ChatInterface({
             height: '32px',
             borderRadius: '50%',
             background: 'rgba(255, 255, 255, 0.05)',
-            transition: 'all 0.2s'
-          }} title="Back to Dashboard">
+            transition: 'all 0.2s',
+            transform: isRTL ? 'rotate(180deg)' : 'none'
+          }} title={t('common.dashboard')}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </Link>
-          <div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: '600', margin: 0 }}>Conversation</h1>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Eternity Portal Active</p>
+          <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: '600', margin: 0 }}>{personaName}</h1>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>{t('chat.portalActive')}</p>
           </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <h2 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--text-primary)', margin: 0 }}>{personaName}</h2>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+          <LanguageSwitcher />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+            <div style={{ textAlign: isRTL ? 'left' : 'right' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: isRTL ? 'flex-start' : 'flex-end', alignItems: 'center', marginTop: '2px' }}>
+                <Link href={`/wizard?id=${personaId}`} style={{ 
+                    fontSize: '0.75rem', 
+                    color: 'var(--accent-primary)',
+                    textDecoration: 'none',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                }}>
+                    {t('chat.editPersona')}
+                </Link>
+                </div>
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', alignItems: 'center', marginTop: '2px' }}>
-              <Link href={`/wizard?id=${personaId}`} style={{ 
-                fontSize: '0.75rem', 
-                color: 'var(--accent-primary)',
-                textDecoration: 'none',
-                fontWeight: '500',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                Edit Persona
-              </Link>
+            <div style={{ 
+                width: '44px', 
+                height: '44px', 
+                borderRadius: '50%', 
+                background: 'var(--bg-tertiary)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                border: '2px solid var(--border-color)',
+                overflow: 'hidden'
+            }}>
+                {avatarUrl ? (
+                <img src={avatarUrl} alt={personaName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                    personaName.charAt(0).toUpperCase()
+                )}
             </div>
-          </div>
-          <div style={{ 
-            width: '44px', 
-            height: '44px', 
-            borderRadius: '50%', 
-            background: 'var(--bg-tertiary)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            fontSize: '1.1rem',
-            fontWeight: '600',
-            border: '2px solid var(--border-color)',
-            overflow: 'hidden'
-          }}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={personaName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-                personaName.charAt(0).toUpperCase()
-            )}
           </div>
         </div>
       </header>
@@ -243,12 +251,13 @@ export default function ChatInterface({
         padding: '2rem',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1.5rem'
+        gap: '1.5rem',
+        direction: isRTL ? 'rtl' : 'ltr'
       }}>
         {messages.map((m: any) => (
           <div key={m.id} style={{
             display: 'flex',
-            flexDirection: m.role === 'user' ? 'row-reverse' : 'row',
+            flexDirection: m.role === 'user' ? (isRTL ? 'row' : 'row-reverse') : (isRTL ? 'row-reverse' : 'row'),
             alignItems: 'flex-start',
             gap: '1rem',
             animation: 'fadeIn 0.5s ease forwards'
@@ -283,20 +292,27 @@ export default function ChatInterface({
               maxWidth: '80%',
               padding: '1rem 1.25rem',
               borderRadius: '18px',
-              borderTopLeftRadius: m.role === 'assistant' ? '2px' : '18px',
-              borderTopRightRadius: m.role === 'user' ? '2px' : '18px',
+              borderTopLeftRadius: (m.role === 'assistant' && !isRTL) || (m.role === 'user' && isRTL) ? '2px' : '18px',
+              borderTopRightRadius: (m.role === 'user' && !isRTL) || (m.role === 'assistant' && isRTL) ? '2px' : '18px',
               background: m.role === 'user' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.05)',
               color: 'var(--text-primary)',
               fontSize: '1rem',
               lineHeight: '1.5',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+              textAlign: isRTL ? 'right' : 'left'
             }}>
               {renderContent(m)}
             </div>
           </div>
         ))}
         {isLoading && (
-          <div style={{ display: 'flex', gap: '8px', padding: '1rem', color: 'var(--text-muted)' }}>
+          <div style={{ 
+              display: 'flex', 
+              gap: '8px', 
+              padding: '1rem', 
+              color: 'var(--text-muted)',
+              flexDirection: isRTL ? 'row-reverse' : 'row'
+          }}>
             <span className="fade-in" style={{ animationDelay: '0s' }}>.</span>
             <span className="fade-in" style={{ animationDelay: '0.2s' }}>.</span>
             <span className="fade-in" style={{ animationDelay: '0.4s' }}>.</span>
@@ -312,7 +328,8 @@ export default function ChatInterface({
         borderTop: '1px solid var(--border-color)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1rem'
+        gap: '1rem',
+        direction: isRTL ? 'rtl' : 'ltr'
       }}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button 
@@ -325,7 +342,8 @@ export default function ChatInterface({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    opacity: (isVisualizing || messages.length === 0) ? 0.5 : 1
+                    opacity: (isVisualizing || messages.length === 0) ? 0.5 : 1,
+                    flexDirection: isRTL ? 'row-reverse' : 'row'
                 }}
             >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -333,19 +351,20 @@ export default function ChatInterface({
                     <circle cx="8.5" cy="8.5" r="1.5" />
                     <polyline points="21 15 16 10 5 21" />
                 </svg>
-                {isVisualizing ? 'Visualizing...' : 'Visualize Current Memory'}
+                {isVisualizing ? t('chat.visualizing') : t('chat.visualize')}
             </button>
         </div>
 
 
         <form onSubmit={handleSubmit} style={{
           display: 'flex',
-          gap: '1rem'
+          gap: '1rem',
+          flexDirection: isRTL ? 'row-reverse' : 'row'
         }}>
           <input
             value={input}
             onChange={handleInputChange}
-            placeholder={`Say something to ${personaName}...`}
+            placeholder={t('chat.inputPlaceholder', { name: personaName })}
             style={{
               flex: 1,
               padding: '1rem 1.5rem',
@@ -354,7 +373,8 @@ export default function ChatInterface({
               border: '1px solid var(--border-color)',
               color: 'var(--text-primary)',
               outline: 'none',
-              fontSize: '1rem'
+              fontSize: '1rem',
+              textAlign: 'inherit'
             }}
           />
           <button type="submit" disabled={isLoading || !input.trim()} className="btn-primary" style={{
@@ -365,7 +385,8 @@ export default function ChatInterface({
             alignItems: 'center',
             justifyContent: 'center',
             padding: 0,
-            opacity: (isLoading || !input.trim()) ? 0.5 : 1
+            opacity: (isLoading || !input.trim()) ? 0.5 : 1,
+            transform: isRTL ? 'rotate(180deg)' : 'none'
           }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -377,4 +398,5 @@ export default function ChatInterface({
     </div>
   );
 }
+
 

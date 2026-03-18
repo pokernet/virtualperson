@@ -1,6 +1,12 @@
+'use client';
+
 import { login, signup } from './actions'
+import { useLanguage } from '@/utils/i18n/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function LoginPage() {
+  const { t, isRTL } = useLanguage();
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -10,6 +16,16 @@ export default function LoginPage() {
       padding: '2rem',
       position: 'relative'
     }}>
+      {/* Top Header with Switcher */}
+      <header style={{
+        position: 'absolute',
+        top: '2rem',
+        [isRTL ? 'left' : 'right']: '2rem',
+        zIndex: 10
+      }}>
+        <LanguageSwitcher />
+      </header>
+
       {/* Subtle Background Glow */}
       <div style={{
         position: 'absolute',
@@ -44,37 +60,15 @@ export default function LoginPage() {
             WebkitTextFillColor: 'transparent',
             marginBottom: '0.5rem'
           }}>
-            Welcome Back
+            {t('login.welcome')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Sign in to access your connections.</p>
+          <p style={{ color: 'var(--text-secondary)' }}>{t('login.subtitle')}</p>
         </div>
 
         <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label htmlFor="full_name" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              Full Name (if signing up)
-            </label>
-            <input
-              id="full_name"
-              name="full_name"
-              type="text"
-              placeholder="Your name"
-              style={{
-                width: '100%',
-                padding: '0.875rem 1rem',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                transition: 'border-color 0.2s ease'
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label htmlFor="email" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              Email Address
+              {t('login.emailLabel')}
             </label>
             <input
               id="email"
@@ -90,14 +84,15 @@ export default function LoginPage() {
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
                 outline: 'none',
-                transition: 'border-color 0.2s ease'
+                transition: 'border-color 0.2s ease',
+                textAlign: 'inherit'
               }}
             />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label htmlFor="password" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              Password
+              {t('login.passwordLabel')}
             </label>
             <input
               id="password"
@@ -113,17 +108,18 @@ export default function LoginPage() {
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
                 outline: 'none',
-                transition: 'border-color 0.2s ease'
+                transition: 'border-color 0.2s ease',
+                textAlign: 'inherit'
               }}
             />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
             <button formAction={login} className="btn-primary" style={{ width: '100%' }}>
-              Sign In
+              {t('login.signIn')}
             </button>
             <button formAction={signup} className="btn-secondary" style={{ width: '100%' }}>
-              Create Account
+              {t('login.signUp')}
             </button>
           </div>
         </form>
@@ -131,3 +127,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

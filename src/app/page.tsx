@@ -1,6 +1,12 @@
+'use client';
+
 import Link from 'next/link';
+import { useLanguage } from '@/utils/i18n/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Home() {
+  const { t } = useLanguage();
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -12,6 +18,16 @@ export default function Home() {
       position: 'relative',
       overflow: 'hidden'
     }}>
+      {/* Header with Switcher */}
+      <header style={{
+        position: 'absolute',
+        top: '2rem',
+        right: '2rem',
+        zIndex: 10
+      }}>
+        <LanguageSwitcher />
+      </header>
+
       {/* Background Glow */}
       <div style={{
         position: 'absolute',
@@ -58,8 +74,7 @@ export default function Home() {
           maxWidth: '600px',
           margin: '0 auto'
         }}>
-          Preserve the memories, voice, and presence of those you love.
-          Create a private, interactive connection that lasts forever.
+          {t('landing.subtitle')}
         </p>
 
         <div style={{
@@ -68,13 +83,14 @@ export default function Home() {
           marginTop: '2rem'
         }}>
           <Link href="/login" className="btn-primary" style={{ fontSize: '1.1rem', padding: '0.8rem 2rem', display: 'inline-block' }}>
-            Get Started
+            {t('landing.getStarted')}
           </Link>
           <button className="btn-secondary" style={{ fontSize: '1.1rem', padding: '0.8rem 2rem' }}>
-            Learn More
+            {t('landing.footer')}
           </button>
         </div>
       </main>
     </div>
   );
 }
+

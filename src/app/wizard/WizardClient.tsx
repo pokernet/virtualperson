@@ -1,8 +1,10 @@
 'use client';
 
-import { createPersona } from './actions'
-import Link from 'next/link'
-import { useState, useRef } from 'react'
+import { useState, useRef } from 'react';
+import Link from 'next/link';
+import { createPersona } from './actions';
+import { useLanguage } from '@/utils/i18n/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface PersonaData {
   id: string;
@@ -21,6 +23,7 @@ export default function WizardClient({
   personaData: PersonaData | null, 
   user: any 
 }) {
+  const { t, isRTL } = useLanguage();
   const [previewUrl, setPreviewUrl] = useState<string | null>(personaData?.avatar_url || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,27 +46,32 @@ export default function WizardClient({
       padding: '2rem',
       maxWidth: '800px',
       margin: '0 auto',
-      gap: '2rem'
+      gap: '2rem',
+      direction: isRTL ? 'rtl' : 'ltr'
     }}>
       <header style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '1rem',
+        justifyContent: 'space-between',
         paddingBottom: '1.5rem',
-        borderBottom: '1px solid var(--border-color)'
+        borderBottom: '1px solid var(--border-color)',
+        flexDirection: isRTL ? 'row-reverse' : 'row'
       }}>
-        <Link href="/dashboard" style={{
-          color: 'var(--text-secondary)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          fontSize: '0.9rem'
-        }}>
-          ← Back to Dashboard
-        </Link>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '600' }}>
-          {isEditing ? 'Edit Profile' : 'Create Profile'}
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+            <Link href="/dashboard" style={{
+            color: 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '0.9rem'
+            }}>
+            {isRTL ? '→' : '←'} {t('common.back')}
+            </Link>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+            {isEditing ? t('common.editProfile') : t('common.createProfile')}
+            </h1>
+        </div>
+        <LanguageSwitcher />
       </header>
 
       <main className="glass-panel" style={{
@@ -74,16 +82,19 @@ export default function WizardClient({
         gap: '2rem',
         opacity: isSubmitting ? 0.7 : 1,
         pointerEvents: isSubmitting ? 'none' : 'auto',
-        transition: 'opacity 0.2s'
+        transition: 'opacity 0.2s',
+        textAlign: isRTL ? 'right' : 'left'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: '500', marginBottom: '0.5rem' }}>
-            {isEditing ? `Updating ${personaData.name}` : 'Bring a memory to life.'}
+            {isEditing 
+                ? t('wizard.editTitle', { name: personaData.name }) 
+                : t('wizard.title')}
           </h2>
           <p style={{ color: 'var(--text-secondary)' }}>
             {isEditing 
-              ? 'Refine their traits and speaking style to better match your memories.'
-              : 'Tell us about them so the AI can accurately represent their voice and personality.'}
+              ? t('wizard.editSubtitle')
+              : t('wizard.subtitle')}
           </p>
         </div>
 
@@ -123,7 +134,7 @@ export default function WizardClient({
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                         <circle cx="12" cy="7" r="4" />
                     </svg>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px' }}>Add Photo</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px' }}>{t('wizard.photoLabel')}</p>
                 </div>
               )}
             </div>
@@ -135,7 +146,7 @@ export default function WizardClient({
                 fontWeight: '500',
                 textDecoration: 'underline'
               }}>
-                {isEditing ? 'Change Profile Picture' : 'Upload Profile Picture'}
+                {isEditing ? t('wizard.changePhoto') : t('wizard.uploadPhoto')}
               </label>
               <input 
                 id="avatar" 
@@ -152,7 +163,7 @@ export default function WizardClient({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label htmlFor="name" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                Their Name
+                {t('wizard.nameLabel')}
               </label>
               <input
                 id="name"
@@ -160,7 +171,7 @@ export default function WizardClient({
                 type="text"
                 required
                 defaultValue={personaData?.name || ''}
-                placeholder="e.g., John Doe"
+                placeholder={t('wizard.namePlaceholder')}
                 style={{
                   width: '100%',
                   padding: '0.875rem 1rem',
@@ -168,14 +179,15 @@ export default function WizardClient({
                   background: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
-                  outline: 'none'
+                  outline: 'none',
+                  textAlign: 'inherit'
                 }}
               />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label htmlFor="relationship" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                Your Relationship to Them
+                {t('wizard.relationshipLabel')}
               </label>
               <input
                 id="relationship"
@@ -183,7 +195,7 @@ export default function WizardClient({
                 type="text"
                 required
                 defaultValue={personaData?.relationship || ''}
-                placeholder="e.g., Son, Sister, Friend"
+                placeholder={t('wizard.relationshipPlaceholder')}
                 style={{
                   width: '100%',
                   padding: '0.875rem 1rem',
@@ -191,7 +203,8 @@ export default function WizardClient({
                   background: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
-                  outline: 'none'
+                  outline: 'none',
+                  textAlign: 'inherit'
                 }}
               />
             </div>
@@ -199,7 +212,7 @@ export default function WizardClient({
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label htmlFor="traits" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-              Personality Traits
+              {t('wizard.traitsLabel')}
             </label>
             <textarea
               id="traits"
@@ -207,7 +220,7 @@ export default function WizardClient({
               required
               rows={3}
               defaultValue={personaData?.traits || ''}
-              placeholder="e.g., Warm, sarcastic, always had a story to tell, loved gardening."
+              placeholder={t('wizard.traitsPlaceholder')}
               style={{
                 width: '100%',
                 padding: '0.875rem 1rem',
@@ -216,21 +229,22 @@ export default function WizardClient({
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
                 outline: 'none',
-                resize: 'vertical'
+                resize: 'vertical',
+                textAlign: 'inherit'
               }}
             />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label htmlFor="catchphrases" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-              Catchphrases & Speaking Style
+              {t('wizard.catchphrasesLabel')}
             </label>
             <textarea
               id="catchphrases"
               name="catchphrases"
               rows={2}
               defaultValue={personaData?.catchphrases || ''}
-              placeholder="e.g., Used the word 'grand' a lot. Often said, 'It'll all wash out in the rain.'"
+              placeholder={t('wizard.catchphrasesPlaceholder')}
               style={{
                 width: '100%',
                 padding: '0.875rem 1rem',
@@ -239,14 +253,15 @@ export default function WizardClient({
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
                 outline: 'none',
-                resize: 'vertical'
+                resize: 'vertical',
+                textAlign: 'inherit'
               }}
             />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label htmlFor="memories" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-              Key Memories & Life Details
+              {t('wizard.memoriesLabel')}
             </label>
             <textarea
               id="memories"
@@ -254,7 +269,7 @@ export default function WizardClient({
               required
               rows={4}
               defaultValue={personaData?.memories || ''}
-              placeholder="e.g., Grew up in Chicago. We used to go fishing every Sunday. Worked as a teacher for 40 years."
+              placeholder={t('wizard.memoriesPlaceholder')}
               style={{
                 width: '100%',
                 padding: '0.875rem 1rem',
@@ -263,7 +278,8 @@ export default function WizardClient({
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
                 outline: 'none',
-                resize: 'vertical'
+                resize: 'vertical',
+                textAlign: 'inherit'
               }}
             />
           </div>
@@ -278,16 +294,17 @@ export default function WizardClient({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                flexDirection: isRTL ? 'row-reverse' : 'row'
             }}
           >
             {isSubmitting ? (
               <>
                 <div className="spinner" style={{ width: '20px', height: '20px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                Saving Profile...
+                {t('common.saving')}
               </>
             ) : (
-              isEditing ? 'Save Changes & Return to Chat' : 'Generate Persona & Start Chat'
+              isEditing ? t('wizard.submitEdit') : t('wizard.submitCreate')
             )}
           </button>
         </form>
@@ -300,3 +317,4 @@ export default function WizardClient({
     </div>
   )
 }
+
