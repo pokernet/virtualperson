@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   // Fetch the user's AI personas
   const { data: personas, error } = await supabase
     .from('ai_personas')
-    .select('id, name, relationship, created_at')
+    .select('id, name, relationship, created_at, avatar_url')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -103,9 +103,15 @@ export default async function DashboardPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '1.2rem',
-                    color: 'var(--text-secondary)'
+                    color: 'var(--text-secondary)',
+                    overflow: 'hidden',
+                    border: '1px solid var(--border-color)'
                   }}>
-                    {persona.name.charAt(0).toUpperCase()}
+                    {persona.avatar_url ? (
+                      <img src={persona.avatar_url} alt={persona.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      persona.name.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '500', marginBottom: '0.25rem' }}>
                     {persona.name}

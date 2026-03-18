@@ -82,7 +82,53 @@ export default async function WizardPage({ searchParams }: WizardPageProps) {
         <form action={createPersona} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Hidden ID input for updates */}
           {isEditing && <input type="hidden" name="id" value={personaData.id} />}
+          {isEditing && <input type="hidden" name="existing_avatar_url" value={personaData.avatar_url || ''} />}
           
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
+            <div style={{
+              width: '100px',
+              height: '100px',
+              borderRadius: '20px',
+              background: 'var(--bg-tertiary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              border: '2px solid var(--border-color)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+            }}>
+              {personaData?.avatar_url ? (
+                <img src={personaData.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              )}
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <label htmlFor="avatar" style={{ 
+                fontSize: '0.9rem', 
+                color: 'var(--accent-primary)', 
+                cursor: 'pointer',
+                fontWeight: '500',
+                textDecoration: 'underline'
+              }}>
+                {isEditing ? 'Change Profile Picture' : 'Upload Profile Picture'}
+              </label>
+              <input 
+                id="avatar" 
+                name="avatar" 
+                type="file" 
+                accept="image/*" 
+                style={{ display: 'none' }} 
+              />
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                Recommended: Square image
+              </p>
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label htmlFor="name" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>

@@ -68,40 +68,16 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      padding: '2rem',
     }}>
-      <header style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingBottom: '1.5rem',
-        marginBottom: '1rem',
-        maxWidth: '800px',
-        width: '100%',
-        margin: '0 auto',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Link href="/dashboard" style={{
-            color: 'var(--text-secondary)',
-            fontSize: '0.9rem'
-            }}>
-            ← Back
-            </Link>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: '500' }}>{persona.name}</h1>
-        </div>
-        
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', background: 'var(--bg-tertiary)', padding: '0.25rem 0.75rem', borderRadius: '999px' }}>
-            Powered by GPT-4o
-        </div>
-      </header>
-
       <ChatInterface 
         personaId={persona.id} 
         personaName={persona.name} 
+        avatarUrl={persona.avatar_url}
         systemPrompt={persona.system_prompt} 
         initialMessages={initialMessages}
       />
     </div>
   )
+
 }
 

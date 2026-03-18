@@ -18,6 +18,29 @@ export async function createPersona(formData: FormData) {
   const traits = formData.get('traits') as string
   const catchphrases = formData.get('catchphrases') as string
   const memories = formData.get('memories') as string
+  const avatarFile = formData.get('avatar') as File | null
+
+  let avatarUrl = formData.get('existing_avatar_url') as string | null
+
+  // Handle avatar upload if a new file is provided
+  if (avatarFile && avatarFile.size > 0) {
+    const fileExt = avatarFile.name.split('.').pop()
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`
+    const filePath = `${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, avatarFile)
+
+    if (uploadError) {
+      console.error('Error uploading avatar:', uploadError)
+    } else {
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+      avatarUrl = publicUrl
+    }
+  }
 
   // Construct the core AI Identity (System Prompt)
   const systemPrompt = `
@@ -48,7 +71,8 @@ INSTRUCTIONS:
         traits,
         catchphrases,
         memories,
-        system_prompt: systemPrompt
+        system_prompt: systemPrompt,
+        avatar_url: avatarUrl
       })
       .eq('id', id)
       .eq('user_id', user.id)
@@ -66,12 +90,14 @@ INSTRUCTIONS:
           traits,
           catchphrases,
           memories,
-          system_prompt: systemPrompt
+          system_prompt: systemPrompt,
+          avatar_url: avatarUrl
         }
       ])
       .select()
       .single()
   }
+
 
   const { data: persona, error } = result
 

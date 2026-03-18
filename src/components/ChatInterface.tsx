@@ -14,6 +14,7 @@ export interface Message {
 interface ChatInterfaceProps {
   personaId: string;
   personaName: string;
+  avatarUrl?: string;
   systemPrompt: string;
   initialMessages?: Message[];
 }
@@ -21,6 +22,7 @@ interface ChatInterfaceProps {
 export default function ChatInterface({ 
   personaId, 
   personaName, 
+  avatarUrl,
   systemPrompt, 
   initialMessages = [] 
 }: ChatInterfaceProps) {
@@ -208,9 +210,14 @@ export default function ChatInterface({
             justifyContent: 'center', 
             fontSize: '1.1rem',
             fontWeight: '600',
-            border: '2px solid var(--border-color)'
+            border: '2px solid var(--border-color)',
+            overflow: 'hidden'
           }}>
-            {personaName.charAt(0).toUpperCase()}
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={personaName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+                personaName.charAt(0).toUpperCase()
+            )}
           </div>
         </div>
       </header>
@@ -258,9 +265,17 @@ export default function ChatInterface({
               fontSize: '0.8rem',
               fontWeight: '600',
               flexShrink: 0,
-              boxShadow: 'var(--shadow-glow)'
+              boxShadow: 'var(--shadow-glow)',
+              overflow: 'hidden',
+              border: m.role === 'assistant' ? '1px solid var(--border-color)' : 'none'
             }}>
-              {m.role === 'user' ? 'U' : personaName.charAt(0)}
+              {m.role === 'user' ? 'U' : (
+                avatarUrl ? (
+                   <img src={avatarUrl} alt={personaName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  personaName.charAt(0)
+                )
+              )}
             </div>
 
             {/* Message Bubble */}
