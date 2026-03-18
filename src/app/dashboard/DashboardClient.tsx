@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { logout } from '@/app/login/actions';
 import { useLanguage } from '@/utils/i18n/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import UsageStatus from '@/components/UsageStatus';
 
 interface Persona {
   id: string;
@@ -13,12 +14,21 @@ interface Persona {
   avatar_url: string | null;
 }
 
+interface Profile {
+  openai_tokens: number;
+  anthropic_tokens: number;
+  local_tokens: number;
+  account_status: string;
+}
+
 export default function DashboardClient({ 
   personas, 
-  userEmail 
+  userEmail,
+  profile
 }: { 
   personas: Persona[] | null, 
-  userEmail: string | undefined 
+  userEmail: string | undefined,
+  profile: Profile | null
 }) {
   const { language, t, isRTL } = useLanguage();
 
@@ -38,21 +48,26 @@ export default function DashboardClient({
         alignItems: 'center',
         paddingBottom: '1.5rem',
         borderBottom: '1px solid var(--border-color)',
-        flexDirection: isRTL ? 'row-reverse' : 'row'
       }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: '600' }}>{t('dashboard.title')}</h1>
         <div style={{ 
             display: 'flex', 
             gap: '1.5rem', 
             alignItems: 'center',
-            flexDirection: isRTL ? 'row-reverse' : 'row'
         }}>
+          {profile && (
+            <UsageStatus 
+              openaiTokens={profile.openai_tokens}
+              anthropicTokens={profile.anthropic_tokens}
+              localTokens={profile.local_tokens}
+              status={profile.account_status}
+            />
+          )}
           <LanguageSwitcher />
           <div style={{ 
               display: 'flex', 
               gap: '1rem', 
               alignItems: 'center',
-              flexDirection: isRTL ? 'row-reverse' : 'row'
           }}>
             <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                 {userEmail}
@@ -158,7 +173,6 @@ export default function DashboardClient({
                         display: 'flex', 
                         gap: '1rem', 
                         alignItems: 'center',
-                        flexDirection: isRTL ? 'row-reverse' : 'row' 
                     }}>
                       <Link href={`/wizard?id=${persona.id}`} style={{ 
                         color: 'var(--text-secondary)', 

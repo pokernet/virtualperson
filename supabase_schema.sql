@@ -6,7 +6,11 @@ create table if not exists public.profiles (
   updated_at timestamp with time zone,
   username text unique,
   full_name text,
-  avatar_url text
+  avatar_url text,
+  openai_tokens bigint default 0,
+  anthropic_tokens bigint default 0,
+  local_tokens bigint default 0,
+  account_status text default 'Active'
 );
 
 -- Enable RLS on profiles
@@ -69,8 +73,8 @@ create policy "Users can insert messages to their chats." on public.messages for
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+  insert into public.profiles (id, full_name, avatar_url, openai_tokens, anthropic_tokens, local_tokens, account_status)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url', 0, 0, 0, 'Active');
   return new;
 end;
 $$ language plpgsql security definer;

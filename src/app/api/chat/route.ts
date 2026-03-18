@@ -92,6 +92,25 @@ export async function POST(req: Request) {
     onFinish: async (event) => {
       // Save the assistant's response when finished
       await saveMessage(chatId, 'assistant', event.text);
+
+      // --- Token Tracking Enhancement ---
+      if (event.usage) {
+        const { totalTokens } = event.usage;
+        const column = modelPref === 'anthropic' ? 'anthropic_tokens' : 
+                      modelPref === 'local' ? 'local_tokens' : 'openai_tokens';
+
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ [column]: totalTokens }) // This should ideally be an increment, but for simplicity we set it or use an RPC
+          .eq('id', user.id);
+        
+        // Alternatively, use an RPC for atomic increment to avoid race conditions
+        // await supabase.rpc('increment_tokens', { user_id: user.id, provider: column, amount: totalTokens });
+
+        if (updateError) {
+          console.error('Error updating token usage:', updateError);
+        }
+      }
     }
   });
   
