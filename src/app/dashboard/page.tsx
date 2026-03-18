@@ -12,11 +12,15 @@ export default async function DashboardPage() {
   }
 
   // Fetch the user's AI personas
-  const { data: personas } = await supabase
+  const { data: personas, error: personaError } = await supabase
     .from('ai_personas')
-    .select('id, name, relationship, created_at, avatar_url')
+    .select('id, name, relationship, created_at, avatar_url, is_public')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+
+  if (personaError) {
+    console.error('Error fetching personas:', personaError)
+  }
 
   // Fetch the user's profile for token usage
   const { data: profile } = await supabase

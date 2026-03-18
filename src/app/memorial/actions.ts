@@ -15,7 +15,11 @@ export async function getOrCreateMemorial(personaId: string) {
 
   if (memorial) return memorial;
 
-  // If not found, create one
+  // If not found, only create if the user is authenticated (owner check happens in RLS)
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  // Create one
   const { data: newMemorial, error: createError } = await supabase
     .from('memorials')
     .insert({ persona_id: personaId })
@@ -59,7 +63,8 @@ export async function postTribute(memorialId: string, content: string, authorNam
       memorial_id: memorialId,
       user_id: user?.id || null,
       author_name: authorName || (user ? 'Authenticated User' : 'Anonymous'),
-      content
+      content,
+      is_approved: false // Tributes need approval by default
     })
     .select()
     .single();
@@ -139,6 +144,29 @@ export async function updateMemorialDates(memorialId: string, birthDate: string,
       death_date: deathDate || null 
     })
     .eq('id', memorialId);
+
+  if (error) throw error;
+  revalidatePath(`/memorial/${memorialId}`);
+}
+
+export async function togglePersonaPublic(personaId: string, isPublic: boolean) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('ai_personas')
+    .update({ is_public: isPublic })
+    .eq('id', personaId);
+
+  if (error) throw error;
+  revalidatePath('/dashboard');
+  revalidatePath('/public');
+}
+
+export async function approveTribute(memorialId: string, messageId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('memorial_messages')
+    .update({ is_approved: true })
+    .eq('id', messageId);
 
   if (error) throw error;
   revalidatePath(`/memorial/${memorialId}`);

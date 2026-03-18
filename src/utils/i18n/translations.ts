@@ -74,6 +74,44 @@ export const translations = {
       inputPlaceholder: 'Say something to {name}...',
       welcomeMsg: "Hello. I am here. It's good to talk to you.",
       visualizationSent: 'Here is a visualization of that memory:'
+    },
+    public: {
+      title: 'Public Memorials',
+      subtitle: 'Discover and honor the memories of those who have passed.',
+      visit: 'Visit Memorial',
+      noPublic: 'No public memorials are available at the moment.',
+      createTitle: 'Want to memorialize a loved one?',
+      createSubtitle: 'Create an AI persona to keep their memories alive and allow you to always talk with them.',
+      createBtn: 'Create Profile Now',
+      backToDashboard: 'Back to my dashboard'
+    },
+    memorial: {
+      backToDashboard: 'Back to Dashboard',
+      inLovingMemory: 'In Loving Memory',
+      bio: 'Biography',
+      editBio: 'Edit Bio',
+      save: 'Save',
+      noBio: 'No biography added yet.',
+      gallery: 'Gallery',
+      addPhoto: 'Add Photo',
+      uploading: 'Uploading...',
+      noPhotos: 'No photos in the gallery yet.',
+      tributes: 'Tributes',
+      details: 'Details',
+      born: 'Born',
+      departed: 'Departed',
+      unknown: 'Unknown'
+    },
+    tributes: {
+      title: 'Leave a Tribute',
+      nameLabel: 'Your Name (Optional)',
+      contentPlaceholder: 'Share a memory or message...',
+      postBtn: 'Post Tribute',
+      posting: 'Posting...',
+      pending: 'Pending Approval',
+      approve: 'Approve',
+      noTributes: 'No tributes yet. Be the first to share a memory.',
+      anonymous: 'Anonymous'
     }
   },
   he: {
@@ -149,6 +187,44 @@ export const translations = {
       inputPlaceholder: 'אמור משהו ל{name}...',
       welcomeMsg: 'שלום. אני כאן. טוב לדבר איתך.',
       visualizationSent: 'הנה המחשה ויזואלית של הזיכרון הזה:'
+    },
+    public: {
+      title: 'לוח זיכרון ציבורי',
+      subtitle: 'מגלים ומוקירים את זכרם של אלו שאינם.',
+      visit: 'בקר בדף הזיכרון',
+      noPublic: 'אין דפי זיכרון ציבוריים להצגה כרגע.',
+      createTitle: 'רוצים להנציח אדם אהוב?',
+      createSubtitle: 'צרו אישיות AI שתשמור על זיכרונותיהם חים ותאפשר לכם לשוחח איתם תמיד.',
+      createBtn: 'בנה פרופיל עכשיו',
+      backToDashboard: 'חזרה ללוח הבקרה שלי'
+    },
+    memorial: {
+      backToDashboard: 'חזרה ללוח הבקרה',
+      inLovingMemory: 'לזכרו',
+      bio: 'ביוגרפיה',
+      editBio: 'ערוך ביוגרפיה',
+      save: 'שמור',
+      noBio: 'טרם נוספה ביוגרפיה.',
+      gallery: 'גלריה',
+      addPhoto: 'הוסף תמונה',
+      uploading: 'מעלה...',
+      noPhotos: 'אין תמונות בגלריה עדיין.',
+      tributes: 'הספדים ומילים לזכרם',
+      details: 'פרטים',
+      born: 'תאריך לידה',
+      departed: 'נפטר/ה',
+      unknown: 'לא ידוע'
+    },
+    tributes: {
+      title: 'כתבו הספד / מילים לזכרם',
+      nameLabel: 'שמך (אופציונלי)',
+      contentPlaceholder: 'שתפו זיכרון או מסר...',
+      postBtn: 'שלח מילים',
+      posting: 'מעלה...',
+      pending: 'ממתין לאישור',
+      approve: 'אשר',
+      noTributes: 'אין עדיין הספדים. היו הראשונים לשתף זיכרון.',
+      anonymous: 'אנונימי'
     }
   },
   ru: {

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useLanguage } from '@/utils/i18n/LanguageContext';
 import DigitalCandle from './DigitalCandle';
 import TributeWall from './TributeWall';
-import { lightCandle, postTribute, updateBio, uploadMemorialImage, deleteMemorialImage, updateMemorialDates } from '@/app/memorial/actions';
+import { lightCandle, postTribute, updateBio, uploadMemorialImage, deleteMemorialImage, updateMemorialDates, approveTribute } from '@/app/memorial/actions';
+import { useRouter } from 'next/navigation';
 
 interface MemorialViewProps {
   memorial: any;
@@ -23,6 +24,7 @@ const MemorialView: React.FC<MemorialViewProps> = ({
   isOwner 
 }) => {
   const { t, isRTL } = useLanguage();
+  const router = useRouter();
   const [bio, setBio] = useState(memorial.bio || '');
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -30,6 +32,10 @@ const MemorialView: React.FC<MemorialViewProps> = ({
   const [birthDate, setBirthDate] = useState(memorial.birth_date || '');
   const [deathDate, setDeathDate] = useState(memorial.death_date || '');
   const [isEditingDates, setIsEditingDates] = useState(false);
+
+  const handleApprove = async (msgId: string) => {
+    await approveTribute(memorial.id, msgId);
+  };
 
   const handleSaveBio = async () => {
     await updateBio(memorial.id, bio);
@@ -71,7 +77,7 @@ const MemorialView: React.FC<MemorialViewProps> = ({
       {/* Header */}
       <header style={{ textAlign: 'center' }}>
         <Link href="/dashboard" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', display: 'inline-block' }}>
-          {isRTL ? '→ חזרה ללוח הבקרה' : '← Back to Dashboard'}
+          {isRTL ? `← ${t('memorial.backToDashboard')}` : `← ${t('memorial.backToDashboard')}`}
         </Link>
         <div style={{
           width: '120px',
@@ -108,14 +114,14 @@ const MemorialView: React.FC<MemorialViewProps> = ({
           {/* Biography */}
           <section className="glass-panel" style={{ padding: '2rem', borderRadius: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '600' }}>{isRTL ? 'לזכרו' : 'In Loving Memory'}</h2>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '600' }}>{t('memorial.inLovingMemory')}</h2>
               {isOwner && (
                 <button 
                   onClick={() => isEditingBio ? handleSaveBio() : setIsEditingBio(true)}
                   className="btn-secondary"
                   style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
                 >
-                  {isEditingBio ? (isRTL ? 'שמור' : 'Save') : (isRTL ? 'ערוך ביוגרפיה' : 'Edit Bio')}
+                  {isEditingBio ? t('memorial.save') : t('memorial.editBio')}
                 </button>
               )}
             </div>
@@ -138,7 +144,7 @@ const MemorialView: React.FC<MemorialViewProps> = ({
               />
             ) : (
               <p style={{ lineHeight: '1.8', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', textAlign: isRTL ? 'right' : 'left' }}>
-                {bio || (isRTL ? 'טרם נוספה ביוגרפיה.' : 'No biography added yet.')}
+                {bio || t('memorial.noBio')}
               </p>
             )}
           </section>
@@ -146,10 +152,10 @@ const MemorialView: React.FC<MemorialViewProps> = ({
           {/* Gallery */}
           <section>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '600' }}>{isRTL ? 'גלריה' : 'Gallery'}</h2>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '600' }}>{t('memorial.gallery')}</h2>
               {isOwner && (
                 <label className="btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', cursor: 'pointer', opacity: isUploading ? 0.5 : 1 }}>
-                  {isUploading ? (isRTL ? 'מעלה...' : 'Uploading...') : (isRTL ? 'הוסף תמונה' : 'Add Photo')}
+                  {isUploading ? t('memorial.uploading') : t('memorial.addPhoto')}
                   <input type="file" hidden accept="image/*" onChange={handleImageUpload} disabled={isUploading} />
                 </label>
               )}
@@ -200,19 +206,21 @@ const MemorialView: React.FC<MemorialViewProps> = ({
               </div>
             ) : (
               <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem', background: 'var(--bg-tertiary)', borderRadius: '16px' }}>
-                {isRTL ? 'אין תמונות בגלריה עדיין.' : 'No photos in the gallery yet.'}
+                {t('memorial.noPhotos')}
               </p>
             )}
           </section>
 
           {/* Tribute Wall */}
           <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem' }}>{isRTL ? 'הספדים ומילים לזכרם' : 'Tributes'}</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem' }}>{t('memorial.tributes')}</h2>
             <TributeWall 
               memorialId={memorial.id}
-              initialMessages={messages}
+              initialMessages={isOwner ? messages : messages.filter((m: any) => m.is_approved)}
               onPost={(content, name) => postTribute(memorial.id, content, name)}
               isRTL={isRTL}
+              isOwner={isOwner}
+              onApprove={handleApprove}
             />
           </section>
         </div>
@@ -227,31 +235,31 @@ const MemorialView: React.FC<MemorialViewProps> = ({
 
           <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', margin: 0 }}>{isRTL ? 'פרטים' : 'Details'}</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', margin: 0 }}>{t('memorial.details')}</h3>
                 {isOwner && (
                     <button 
                         onClick={() => isEditingDates ? handleSaveDates() : setIsEditingDates(true)}
                         style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
                     >
-                        {isEditingDates ? (isRTL ? 'שמור' : 'Save') : (isRTL ? 'ערוך' : 'Edit')}
+                        {isEditingDates ? t('memorial.save') : t('common.edit')}
                     </button>
                 )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.9rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--text-muted)' }}>{isRTL ? 'תאריך לידה' : 'Born'}</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('memorial.born')}</span>
                 {isEditingDates ? (
                     <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '4px', color: 'white', padding: '2px 4px' }} />
                 ) : (
-                    <span>{birthDate || (isRTL ? 'לא ידוע' : 'Unknown')}</span>
+                    <span>{birthDate || t('memorial.unknown')}</span>
                 )}
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--text-muted)' }}>{isRTL ? 'נפטר/ה' : 'Departed'}</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('memorial.departed')}</span>
                 {isEditingDates ? (
                     <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '4px', color: 'white', padding: '2px 4px' }} />
                 ) : (
-                    <span>{deathDate || (isRTL ? 'לא ידוע' : 'Unknown')}</span>
+                    <span>{deathDate || t('memorial.unknown')}</span>
                 )}
               </div>
             </div>
