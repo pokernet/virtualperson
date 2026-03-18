@@ -11,12 +11,13 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  // Fetch the user's AI personas
+  // Fetch the user's AI personas (limit 30)
   const { data: personas, error: personaError } = await supabase
     .from('ai_personas')
     .select('id, name, relationship, created_at, avatar_url, is_public')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+    .limit(30);
 
   if (personaError) {
     console.error('Error fetching personas:', personaError)
