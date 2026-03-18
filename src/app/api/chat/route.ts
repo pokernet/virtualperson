@@ -26,13 +26,40 @@ function resolveAiModel(modelPref: string = 'openai'): LanguageModel {
 }
 
 export async function POST(req: Request) {
-  const { messages, systemPrompt, modelPref, personaId } = await req.json();
+  const body = await req.json();
+  let { messages, systemPrompt, modelPref, personaId } = body;
+
+  // Robust extraction: if missing from top-level, check the last message metadata
+  const lastMessage = messages[messages.length - 1];
+  if (!personaId && lastMessage?.metadata?.personaId) {
+    personaId = lastMessage.metadata.personaId;
+  }
+  if (!systemPrompt && lastMessage?.metadata?.systemPrompt) {
+    systemPrompt = lastMessage.metadata.systemPrompt;
+  }
+
   const supabase = await createClient();
+
+
+
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
+
+  // Normalize messages for the AI model: ensure each has a 'content' string
+  const normalizedMessages = messages.map((m: any) => {
+    if (m.content) return m;
+    let content = '';
+    if (m.parts) {
+      content = m.parts
+        .filter((p: any) => p.type === 'text')
+        .map((p: any) => p.text)
+        .join('\n');
+    }
+    return { ...m, content };
+  });
 
   const model = resolveAiModel(modelPref || (process.env.AI_MODEL_PREFERENCE as string));
 
@@ -42,12 +69,24 @@ export async function POST(req: Request) {
   // Save the user's latest message
   const lastUserMessage = messages[messages.length - 1];
   if (lastUserMessage && lastUserMessage.role === 'user') {
-    await saveMessage(chatId, 'user', lastUserMessage.content);
+    // Robust content extraction for newest AI SDK versions (uses 'parts' instead of 'content')
+    let userContent = lastUserMessage.content || '';
+    if (!userContent && lastUserMessage.parts) {
+      userContent = lastUserMessage.parts
+        .filter((p: any) => p.type === 'text')
+        .map((p: any) => p.text)
+        .join('\n');
+    }
+    
+    if (userContent) {
+      await saveMessage(chatId, 'user', userContent);
+    }
   }
+
 
   const result = streamText({
     model,
-    messages,
+    messages: normalizedMessages,
     system: systemPrompt,
     temperature: 0.7,
     onFinish: async (event) => {
@@ -55,8 +94,10 @@ export async function POST(req: Request) {
       await saveMessage(chatId, 'assistant', event.text);
     }
   });
-
-  return result.toDataStreamResponse();
+  
+  return (result as any).toUIMessageStreamResponse();
 }
+
+
 
 

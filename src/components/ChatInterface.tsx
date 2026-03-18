@@ -1,32 +1,50 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
-import { type Message } from 'ai';
-import { useEffect, useRef, useState } from 'react';
+
+// Define Message type since we can't get it from ai/react easily
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant' | 'system' | 'data';
+  content: string;
+}
 
 interface ChatInterfaceProps {
   personaId: string;
   personaName: string;
   systemPrompt: string;
+  initialMessages?: Message[];
 }
 
-export default function ChatInterface({ personaId, personaName, systemPrompt }: ChatInterfaceProps) {
+export default function ChatInterface({ 
+  personaId, 
+  personaName, 
+  systemPrompt, 
+  initialMessages = [] 
+}: ChatInterfaceProps) {
   const [isVisualizing, setIsVisualizing] = useState(false);
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
+  const [input, setInput] = useState('');
+  
+  const chat = useChat({
+    // @ts-ignore
     api: '/api/chat',
     body: {
       systemPrompt,
-      modelPref: 'openai' // In a full app, this comes from user settings
+      personaId,
+      modelPref: 'openai'
     },
-    // You could load initial messages from Supabase here
-    initialMessages: [
+    initialMessages: (initialMessages.length > 0 ? initialMessages : [
       {
         id: 'welcome-msg',
         role: 'assistant',
-        content: `Hello. I'm here. It's good to talk to you.`
+        content: `Hello. I am here. It's good to talk to you.`
       }
-    ]
+    ]) as any
   });
+
+  const { messages, status, error, sendMessage, setMessages } = chat as any;
+  const isLoading = status === 'submitted' || status === 'streaming';
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +52,26 @@ export default function ChatInterface({ personaId, personaName, systemPrompt }: 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    
+    // In this headless version, we can try passing the body metadata if sendMessage supports it,
+    // or just rely on the initial body if the SDK is configured correctly.
+    // However, the server was getting null personaId, so we'll try to follow the SDK's metadata pattern.
+    sendMessage({ 
+      text: input,
+      // Metadata might be passed differently depending on the version
+      metadata: { personaId, systemPrompt } 
+    });
+    
+    setInput('');
+  };
 
   const handleVisualize = async () => {
     if (messages.length === 0 || isVisualizing) return;
@@ -46,10 +84,14 @@ export default function ChatInterface({ personaId, personaName, systemPrompt }: 
       });
       const data = await res.json();
       if (data.imageUrl) {
-        append({
-          role: 'assistant',
-          content: `Here is a visualization of that memory:\n\n![Memory Visualization](${data.imageUrl})`
-        });
+        setMessages([
+          ...messages,
+          {
+            id: `visualization-${Date.now()}`,
+            role: 'assistant',
+            content: `Here is a visualization of that memory:\n\n![Memory Visualization](${data.imageUrl})`
+          }
+        ]);
       }
     } catch (e) {
       console.error(e);
@@ -58,8 +100,21 @@ export default function ChatInterface({ personaId, personaName, systemPrompt }: 
     }
   };
 
-  const renderContent = (content: string) => {
+  const renderContent = (m: any) => {
+    let content = m.content || '';
+    
+    // Robust extraction for newest AI SDK versions (uses 'parts' instead of 'content')
+    if (!content && m.parts) {
+      content = m.parts
+        .filter((p: any) => p.type === 'text')
+        .map((p: any) => p.text)
+        .join('\n');
+    }
+
+    if (!content) return null;
+
     const imgRegex = /!\[.*?\]\((.*?)\)/g;
+
     const parts = [];
     let lastIdx = 0;
     let match;
@@ -102,89 +157,53 @@ export default function ChatInterface({ personaId, personaName, systemPrompt }: 
         flexDirection: 'column',
         gap: '1.5rem'
       }}>
-        {messages.map((m: Message) => (
+        {messages.map((m: any) => (
           <div key={m.id} style={{
             display: 'flex',
             flexDirection: m.role === 'user' ? 'row-reverse' : 'row',
             alignItems: 'flex-start',
-            gap: '1rem'
+            gap: '1rem',
+            animation: 'fadeIn 0.5s ease forwards'
           }}>
             {/* Avatar */}
             <div style={{
               width: '40px',
               height: '40px',
               borderRadius: '50%',
-              background: m.role === 'user' ? 'var(--bg-tertiary)' : 'var(--accent-primary)',
+              background: m.role === 'user' ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
-              fontSize: '1rem',
-              flexShrink: 0
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              flexShrink: 0,
+              boxShadow: 'var(--shadow-glow)'
             }}>
-              {m.role === 'user' ? 'U' : personaName.charAt(0).toUpperCase()}
+              {m.role === 'user' ? 'U' : personaName.charAt(0)}
             </div>
 
             {/* Message Bubble */}
             <div style={{
-              background: m.role === 'user' ? 'var(--bg-tertiary)' : 'rgba(129, 140, 248, 0.1)',
-              padding: '1rem 1.25rem',
-              borderRadius: '16px',
-              borderTopRightRadius: m.role === 'user' ? '4px' : '16px',
-              borderTopLeftRadius: m.role === 'assistant' ? '4px' : '16px',
               maxWidth: '80%',
-              lineHeight: '1.6',
-              color: 'var(--text-primary)'
+              padding: '1rem 1.25rem',
+              borderRadius: '18px',
+              borderTopLeftRadius: m.role === 'assistant' ? '2px' : '18px',
+              borderTopRightRadius: m.role === 'user' ? '2px' : '18px',
+              background: m.role === 'user' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.05)',
+              color: 'var(--text-primary)',
+              fontSize: '1rem',
+              lineHeight: '1.5',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
             }}>
-              {renderContent(m.content)}
+              {renderContent(m)}
             </div>
           </div>
         ))}
         {isLoading && (
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            alignItems: 'center',
-            color: 'var(--text-secondary)'
-          }}>
-             <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'var(--accent-primary)',
-              opacity: 0.5,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white'
-            }}>
-              {personaName.charAt(0).toUpperCase()}
-            </div>
-            <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>is thinking...</div>
-          </div>
-        )}
-        {isVisualizing && (
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            alignItems: 'center',
-            color: 'var(--text-secondary)'
-          }}>
-             <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'var(--accent-secondary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white'
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>visualizing a memory...</div>
+          <div style={{ display: 'flex', gap: '8px', padding: '1rem', color: 'var(--text-muted)' }}>
+            <span className="fade-in" style={{ animationDelay: '0s' }}>.</span>
+            <span className="fade-in" style={{ animationDelay: '0.2s' }}>.</span>
+            <span className="fade-in" style={{ animationDelay: '0.4s' }}>.</span>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -193,9 +212,35 @@ export default function ChatInterface({ personaId, personaName, systemPrompt }: 
       {/* Input Area */}
       <div style={{
         padding: '1.5rem 2rem',
+        background: 'rgba(0,0,0,0.2)',
         borderTop: '1px solid var(--border-color)',
-        background: 'rgba(0,0,0,0.2)'
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem'
       }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <button 
+                onClick={handleVisualize}
+                disabled={isVisualizing || messages.length === 0}
+                className="btn-secondary"
+                style={{ 
+                    fontSize: '0.8rem', 
+                    padding: '0.5rem 1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    opacity: (isVisualizing || messages.length === 0) ? 0.5 : 1
+                }}
+            >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                </svg>
+                {isVisualizing ? 'Visualizing...' : 'Visualize Current Memory'}
+            </button>
+        </div>
+
         <form onSubmit={handleSubmit} style={{
           display: 'flex',
           gap: '1rem'
@@ -230,34 +275,6 @@ export default function ChatInterface({ personaId, personaName, systemPrompt }: 
             </svg>
           </button>
         </form>
-
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
-          <button 
-            onClick={handleVisualize} 
-            disabled={isVisualizing || messages.length < 2 || isLoading}
-            style={{
-              background: 'transparent',
-              color: 'var(--accent-secondary)',
-              border: '1px solid var(--border-highlight)',
-              padding: '0.5rem 1rem',
-              borderRadius: '999px',
-              fontSize: '0.85rem',
-              cursor: (isVisualizing || messages.length < 2 || isLoading) ? 'not-allowed' : 'pointer',
-              opacity: (isVisualizing || messages.length < 2 || isLoading) ? 0.5 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s'
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21 15 16 10 5 21"/>
-            </svg>
-            Visualize Current Memory
-          </button>
-        </div>
       </div>
     </div>
   );

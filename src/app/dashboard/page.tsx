@@ -83,42 +83,68 @@ export default async function DashboardPage() {
 
             {/* List existing personas */}
             {personas.map((persona) => (
-              <Link href={`/chat/${persona.id}`} key={persona.id} className="glass-panel" style={{
+              <div key={persona.id} className="glass-panel fade-in" style={{
                 display: 'flex',
                 flexDirection: 'column',
                 padding: '1.5rem',
                 borderRadius: '16px',
                 minHeight: '200px',
-                transition: 'transform 0.2s, box-shadow 0.2s'
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                position: 'relative'
               }}>
-                <div style={{ 
-                  width: '48px', 
-                  height: '48px', 
-                  borderRadius: '50%', 
-                  background: 'var(--bg-tertiary)',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.2rem',
-                  color: 'var(--text-secondary)'
-                }}>
-                  {persona.name.charAt(0).toUpperCase()}
-                </div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '500', marginBottom: '0.25rem' }}>
-                  {persona.name}
-                </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  {persona.relationship}
-                </p>
+                <Link href={`/chat/${persona.id}`} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ 
+                    width: '48px', 
+                    height: '48px', 
+                    borderRadius: '50%', 
+                    background: 'var(--bg-tertiary)',
+                    marginBottom: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.2rem',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    {persona.name.charAt(0).toUpperCase()}
+                  </div>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: '500', marginBottom: '0.25rem' }}>
+                    {persona.name}
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    {persona.relationship}
+                  </p>
+                </Link>
+
                 <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                        Created {new Date(persona.created_at).toLocaleDateString()}
+                        {new Date(persona.created_at).toLocaleDateString()}
                     </span>
-                    <span style={{ color: 'var(--accent-primary)', fontSize: '0.9rem' }}>Start Chatting →</span>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <Link href={`/chat/${persona.id}`} style={{ color: 'var(--accent-primary)', fontSize: '0.9rem' }}>Chat →</Link>
+                    </div>
                 </div>
-              </Link>
+
+                {/* Delete button absolutely positioned */}
+                <form action={async () => {
+                  'use server';
+                  const { deletePersona } = await import('./actions');
+                  await deletePersona(persona.id);
+                }} style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+                  <button style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: 'var(--text-muted)', 
+                    cursor: 'pointer',
+                    padding: '0.25rem'
+                  }} title="Delete Persona">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                    </svg>
+                  </button>
+                </form>
+              </div>
             ))}
+
           </div>
         ) : (
           <div className="glass-panel" style={{
