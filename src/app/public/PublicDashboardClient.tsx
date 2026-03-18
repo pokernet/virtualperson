@@ -18,9 +18,9 @@ export default function PublicDashboardClient({ personas }: { personas: Persona[
   const [searchQuery, setSearchQuery] = React.useState('');
 
   const filteredPersonas = personas.filter(persona => 
-    persona.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    persona.relationship.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    persona.description.toLowerCase().includes(searchQuery.toLowerCase())
+    (persona.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (persona.relationship || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (persona.description || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
