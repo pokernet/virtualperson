@@ -1,7 +1,35 @@
 import { createPersona } from './actions'
 import Link from 'next/link'
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
 
-export default function WizardPage() {
+interface WizardPageProps {
+  searchParams: Promise<{ id?: string }>
+}
+
+export default async function WizardPage({ searchParams }: WizardPageProps) {
+  const { id } = await searchParams;
+  const supabase = await createClient();
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  let personaData = null;
+  if (id) {
+    const { data, error } = await supabase
+      .from('ai_personas')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single();
+    
+    if (data) {
+      personaData = data;
+    }
+  }
+
+  const isEditing = !!personaData;
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -28,7 +56,9 @@ export default function WizardPage() {
         }}>
           ← Back to Dashboard
         </Link>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '600' }}>Create Profile</h1>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+          {isEditing ? 'Edit Profile' : 'Create Profile'}
+        </h1>
       </header>
 
       <main className="glass-panel" style={{
@@ -40,14 +70,18 @@ export default function WizardPage() {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: '500', marginBottom: '0.5rem' }}>
-            Bring a memory to life.
+            {isEditing ? `Updating ${personaData.name}` : 'Bring a memory to life.'}
           </h2>
           <p style={{ color: 'var(--text-secondary)' }}>
-            Tell us about them so the AI can accurately represent their voice and personality.
+            {isEditing 
+              ? 'Refine their traits and speaking style to better match your memories.'
+              : 'Tell us about them so the AI can accurately represent their voice and personality.'}
           </p>
         </div>
 
         <form action={createPersona} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Hidden ID input for updates */}
+          {isEditing && <input type="hidden" name="id" value={personaData.id} />}
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -59,6 +93,7 @@ export default function WizardPage() {
                 name="name"
                 type="text"
                 required
+                defaultValue={personaData?.name || ''}
                 placeholder="e.g., John Doe"
                 style={{
                   width: '100%',
@@ -81,6 +116,7 @@ export default function WizardPage() {
                 name="relationship"
                 type="text"
                 required
+                defaultValue={personaData?.relationship || ''}
                 placeholder="e.g., Son, Sister, Friend"
                 style={{
                   width: '100%',
@@ -104,6 +140,7 @@ export default function WizardPage() {
               name="traits"
               required
               rows={3}
+              defaultValue={personaData?.traits || ''}
               placeholder="e.g., Warm, sarcastic, always had a story to tell, loved gardening."
               style={{
                 width: '100%',
@@ -126,6 +163,7 @@ export default function WizardPage() {
               id="catchphrases"
               name="catchphrases"
               rows={2}
+              defaultValue={personaData?.catchphrases || ''}
               placeholder="e.g., Used the word 'grand' a lot. Often said, 'It'll all wash out in the rain.'"
               style={{
                 width: '100%',
@@ -149,6 +187,7 @@ export default function WizardPage() {
               name="memories"
               required
               rows={4}
+              defaultValue={personaData?.memories || ''}
               placeholder="e.g., Grew up in Chicago. We used to go fishing every Sunday. Worked as a teacher for 40 years."
               style={{
                 width: '100%',
@@ -164,10 +203,11 @@ export default function WizardPage() {
           </div>
 
           <button className="btn-primary" style={{ marginTop: '1rem', padding: '1rem' }}>
-            Generate Persona & Start Chat
+            {isEditing ? 'Save Changes & Return to Chat' : 'Generate Persona & Start Chat'}
           </button>
         </form>
       </main>
     </div>
   )
 }
+

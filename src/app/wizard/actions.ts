@@ -12,6 +12,7 @@ export async function createPersona(formData: FormData) {
     redirect('/login')
   }
 
+  const id = formData.get('id') as string | null
   const name = formData.get('name') as string
   const relationship = formData.get('relationship') as string
   const traits = formData.get('traits') as string
@@ -36,25 +37,50 @@ INSTRUCTIONS:
 - Keep your responses conversational, not like an essay.
   `.trim()
 
-  const { data: persona, error } = await supabase
-    .from('ai_personas')
-    .insert([
-      {
-        user_id: user.id,
+  let result;
+  if (id) {
+    // UPDATE
+    result = await supabase
+      .from('ai_personas')
+      .update({
         name,
         relationship,
+        traits,
+        catchphrases,
+        memories,
         system_prompt: systemPrompt
-      }
-    ])
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error creating persona:', error)
-    // In a real app, handle error via UI state. Redirecting back to wizard for simplicity.
-    redirect('/wizard?error=Failed processing')
+      })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+  } else {
+    // INSERT
+    result = await supabase
+      .from('ai_personas')
+      .insert([
+        {
+          user_id: user.id,
+          name,
+          relationship,
+          traits,
+          catchphrases,
+          memories,
+          system_prompt: systemPrompt
+        }
+      ])
+      .select()
+      .single()
   }
 
-  // Redirect to the new chat
+  const { data: persona, error } = result
+
+  if (error) {
+    console.error('Error processing persona:', error)
+    redirect(`/wizard${id ? `?id=${id}` : ''}&error=Failed processing`)
+  }
+
+  // Redirect to the chat
   redirect(`/chat/${persona.id}`)
 }
+

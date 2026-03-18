@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
+import Link from 'next/link';
 
 // Define Message type since we can't get it from ai/react easily
 export interface Message {
@@ -137,17 +138,97 @@ export default function ChatInterface({
 
   return (
     <div style={{
+      minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      height: 'calc(100vh - 100px)', // Leave room for header
-      maxWidth: '800px',
+      padding: '2rem',
+      maxWidth: '1200px',
       margin: '0 auto',
-      background: 'var(--surface-glass)',
-      backdropFilter: 'blur(12px)',
-      border: '1px solid var(--surface-glass-border)',
-      borderRadius: '24px',
-      overflow: 'hidden'
+      gap: '2rem'
     }}>
+      <header style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '1rem 0.5rem 1.5rem 0.5rem',
+        borderBottom: '1px solid var(--border-color)',
+        marginBottom: '1rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          <Link href="/dashboard" style={{ 
+            color: 'var(--text-secondary)', 
+            fontSize: '1.25rem',
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.05)',
+            transition: 'all 0.2s'
+          }} title="Back to Dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </Link>
+          <div>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: '600', margin: 0 }}>Conversation</h1>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Eternity Portal Active</p>
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                <h2 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--text-primary)', margin: 0 }}>{personaName}</h2>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', alignItems: 'center', marginTop: '2px' }}>
+              <Link href={`/wizard?id=${personaId}`} style={{ 
+                fontSize: '0.75rem', 
+                color: 'var(--accent-primary)',
+                textDecoration: 'none',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                Edit Persona
+              </Link>
+            </div>
+          </div>
+          <div style={{ 
+            width: '44px', 
+            height: '44px', 
+            borderRadius: '50%', 
+            background: 'var(--bg-tertiary)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            fontSize: '1.1rem',
+            fontWeight: '600',
+            border: '2px solid var(--border-color)'
+          }}>
+            {personaName.charAt(0).toUpperCase()}
+          </div>
+        </div>
+      </header>
+
+
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        maxHeight: 'calc(100vh - 160px)',
+        background: 'var(--surface-glass)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid var(--surface-glass-border)',
+        borderRadius: '24px',
+        overflow: 'hidden'
+      }}>
+
       {/* Chat Messages Area */}
       <div style={{
         flex: 1,
@@ -241,6 +322,7 @@ export default function ChatInterface({
             </button>
         </div>
 
+
         <form onSubmit={handleSubmit} style={{
           display: 'flex',
           gap: '1rem'
@@ -276,6 +358,8 @@ export default function ChatInterface({
           </button>
         </form>
       </div>
+      </div>
     </div>
   );
 }
+
