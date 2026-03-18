@@ -85,14 +85,61 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- 6. Storage Buckets (Memories and Avatars)
-insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true) on conflict do nothing;
-insert into storage.buckets (id, name, public) values ('memories', 'memories', false) on conflict do nothing;
+-- 7. Memorials System
+create table if not exists public.memorials (
+  id uuid default gen_random_uuid() primary key,
+  persona_id uuid references public.ai_personas(id) on delete cascade not null,
+  bio text,
+  birth_date date,
+  death_date date,
+  candle_count int default 0,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
--- Storage Policies for Avatars
-create policy "Avatar images are publicly accessible." on storage.objects for select using (bucket_id = 'avatars');
-create policy "Anyone can upload an avatar." on storage.objects for insert with check (bucket_id = 'avatars');
+-- Enable RLS for memorials
+alter table public.memorials enable row level security;
+create policy "Memorials are viewable by everyone." on public.memorials for select using (true);
+create policy "Users can manage memorials for their personas." on public.memorials for all using (
+  exists (select 1 from public.ai_personas where ai_personas.id = memorials.persona_id and ai_personas.user_id = auth.uid())
+);
 
--- Storage Policies for Memories (User Private)
-create policy "Users can view their own uploaded memories." on storage.objects for select using (bucket_id = 'memories' and auth.uid() = owner);
-create policy "Users can upload memories." on storage.objects for insert with check (bucket_id = 'memories' and auth.uid() = owner);
+-- Memorial Images (Gallery)
+create table if not exists public.memorial_images (
+  id uuid default gen_random_uuid() primary key,
+  memorial_id uuid references public.memorials(id) on delete cascade not null,
+  url text not null,
+  caption text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS for memorial_images
+alter table public.memorial_images enable row level security;
+create policy "Memorial images are viewable by everyone." on public.memorial_images for select using (true);
+create policy "Users can manage images for their memorials." on public.memorial_images for all using (
+  exists (select 1 from public.memorials join public.ai_personas on memorials.persona_id = ai_personas.id where memorials.id = memorial_images.memorial_id and ai_personas.user_id = auth.uid())
+);
+
+-- Memorial Messages (Tributes)
+create table if not exists public.memorial_messages (
+  id uuid default gen_random_uuid() primary key,
+  memorial_id uuid references public.memorials(id) on delete cascade not null,
+  user_id uuid references auth.users(id) on delete set null,
+  author_name text, -- For guest messages
+  content text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS for memorial_messages
+alter table public.memorial_messages enable row level security;
+create policy "Memorial messages are viewable by everyone." on public.memorial_messages for select using (true);
+create policy "Anyone can post a memorial message." on public.memorial_messages for insert with check (true);
+create policy "Users can delete their own messages." on public.memorial_messages for delete using (auth.uid() = user_id);
+
+-- 8. Storage for Memorials
+insert into storage.buckets (id, name, public) values ('memorials', 'memorials', true) on conflict do nothing;
+
+-- Storage Policies for Memorials
+create policy "Memorial photos are publicly accessible." on storage.objects for select using (bucket_id = 'memorials');
+create policy "Anyone can upload to memorials." on storage.objects for insert with check (bucket_id = 'memorials');
+create policy "Anyone can update their own memorial photos." on storage.objects for update using (bucket_id = 'memorials' and auth.uid() = owner);
+create policy "Anyone can delete their own memorial photos." on storage.objects for delete using (bucket_id = 'memorials' and auth.uid() = owner);
