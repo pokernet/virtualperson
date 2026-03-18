@@ -46,7 +46,7 @@ const TributeWall: React.FC<TributeWallProps> = ({ memorialId, initialMessages, 
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', direction: isRTL ? 'rtl' : 'ltr' }}>
+    <div className="tribute-wall-container" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', direction: isRTL ? 'rtl' : 'ltr' }}>
       <form onSubmit={handleSubmit} className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px' }}>
         <h3 style={{ marginBottom: '1rem', fontWeight: '600' }}>{t('tributes.title')}</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -84,8 +84,8 @@ const TributeWall: React.FC<TributeWallProps> = ({ memorialId, initialMessages, 
           <button 
             type="submit" 
             disabled={isSubmitting || !newContent.trim()}
-            className="btn-primary" 
-            style={{ alignSelf: isRTL ? 'flex-start' : 'flex-end', padding: '0.6rem 1.5rem' }}
+            className="btn-primary tribute-submit-btn" 
+            style={{ alignSelf: isRTL ? 'flex-start' : 'flex-end', padding: '0.6rem 1.5rem', minWidth: '120px' }}
           >
             {isSubmitting ? t('tributes.posting') : t('tributes.postBtn')}
           </button>
@@ -94,7 +94,7 @@ const TributeWall: React.FC<TributeWallProps> = ({ memorialId, initialMessages, 
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {messages.length > 0 ? messages.map((msg) => (
-          <div key={msg.id} className="glass-panel" style={{ padding: '1rem 1.5rem', borderRadius: '12px', position: 'relative' }}>
+          <div key={msg.id} className="glass-panel tribute-card" style={{ padding: '1rem 1.5rem', borderRadius: '12px', position: 'relative' }}>
             {isOwner && !msg.is_approved && (
                 <div style={{ 
                     position: 'absolute',

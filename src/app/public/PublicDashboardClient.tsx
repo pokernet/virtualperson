@@ -119,10 +119,11 @@ export default function PublicDashboardClient({ personas }: { personas: Persona[
                 overflow: 'hidden'
               }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <div style={{ 
+                <div className="card-header" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+                  <div className="avatar-container" style={{ 
                     width: '64px', 
                     height: '64px', 
+                    flexShrink: 0,
                     borderRadius: '20px', 
                     background: 'var(--bg-tertiary)',
                     fontSize: '1.6rem',
@@ -139,14 +140,14 @@ export default function PublicDashboardClient({ personas }: { personas: Persona[
                       persona.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <div style={{ textAlign: isRTL ? 'right' : 'left', flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
-                      <h3 style={{ fontSize: '1.3rem', fontWeight: '700', margin: 0, color: 'white' }}>{persona.name}</h3>
-                      <span style={{ fontSize: '0.6rem', background: 'rgba(76, 175, 80, 0.15)', color: '#81c784', padding: '2px 8px', borderRadius: '6px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div className="name-container" style={{ textAlign: isRTL ? 'right' : 'left', flex: 1, minWidth: 0 }}>
+                    <div className="name-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+                      <h3 style={{ fontSize: '1.3rem', fontWeight: '700', margin: 0, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{persona.name}</h3>
+                      <span className="public-badge" style={{ fontSize: '0.6rem', background: 'rgba(76, 175, 80, 0.15)', color: '#81c784', padding: '2px 8px', borderRadius: '6px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {isRTL ? 'ציבורי' : 'Public'}
                       </span>
                     </div>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>{persona.relationship}</p>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: '0.2rem 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{persona.relationship}</p>
                   </div>
                 </div>
 
@@ -211,6 +212,26 @@ export default function PublicDashboardClient({ personas }: { personas: Persona[
         .public-card:hover {
           transform: translateY(-8px);
           border-color: var(--accent-primary) !important;
+        }
+
+        @media (max-width: 600px) {
+          .card-header {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .name-container {
+            text-align: center !important;
+            width: 100%;
+          }
+          .name-row {
+            justify-content: center !important;
+            flex-direction: column !important;
+            gap: 0.25rem !important;
+          }
+          .public-card {
+            padding: 1.5rem !important;
+          }
         }
       `}</style>
     </div>

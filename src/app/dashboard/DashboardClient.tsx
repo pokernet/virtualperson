@@ -43,16 +43,18 @@ export default function DashboardClient({
       margin: '0 auto',
       gap: '2rem'
     }}>
-      <header style={{
+      <header className="dashboard-header" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingBottom: '1.5rem',
         borderBottom: '1px solid var(--border-color)',
+        gap: '1rem',
+        flexWrap: 'wrap'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '600' }}>{t('dashboard.title')}</h1>
-          <div style={{ height: '1.5rem', width: '1px', background: 'var(--border-color)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>{t('dashboard.title')}</h1>
+          <div className="header-divider" style={{ height: '1.5rem', width: '1px', background: 'var(--border-color)' }} />
           <Link href="/public" style={{ 
             fontSize: '0.9rem', 
             color: 'var(--accent-primary)', 
@@ -70,18 +72,21 @@ export default function DashboardClient({
             {isRTL ? 'לוח ציבורי' : 'Public Dashboard'}
           </Link>
         </div>
-        <div style={{ 
+        <div className="header-meta" style={{ 
             display: 'flex', 
             gap: '1.5rem', 
             alignItems: 'center',
+            flexWrap: 'wrap'
         }}>
           {profile && (
-            <UsageStatus 
-              openaiTokens={profile.openai_tokens}
-              anthropicTokens={profile.anthropic_tokens}
-              localTokens={profile.local_tokens}
-              status={profile.account_status}
-            />
+            <div className="usage-container">
+              <UsageStatus 
+                openaiTokens={profile.openai_tokens}
+                anthropicTokens={profile.anthropic_tokens}
+                localTokens={profile.local_tokens}
+                status={profile.account_status}
+              />
+            </div>
           )}
           <LanguageSwitcher />
           <div style={{ 
@@ -89,7 +94,7 @@ export default function DashboardClient({
               gap: '1rem', 
               alignItems: 'center',
           }}>
-            <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            <span className="user-email" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                 {userEmail}
             </span>
             <form action={logout}>
@@ -147,8 +152,8 @@ export default function DashboardClient({
                 position: 'relative',
                 textAlign: isRTL ? 'right' : 'left'
               }}>
-                <Link href={`/chat/${persona.id}`} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ 
+                <Link href={`/chat/${persona.id}`} className="persona-card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div className="persona-avatar-wrapper" style={{ 
                     width: '56px', 
                     height: '56px', 
                     borderRadius: '16px', 
@@ -161,7 +166,8 @@ export default function DashboardClient({
                     color: 'var(--text-secondary)',
                     overflow: 'hidden',
                     border: '1px solid var(--border-color)',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    flexShrink: 0
                   }}>
                     {persona.avatar_url ? (
                       <img src={persona.avatar_url} alt={persona.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -169,12 +175,14 @@ export default function DashboardClient({
                       persona.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <h3 style={{ fontSize: '1.35rem', fontWeight: '600', marginBottom: '0.35rem' }}>
-                    {persona.name}
-                  </h3>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                    {persona.relationship}
-                  </p>
+                  <div className="persona-info">
+                    <h3 style={{ fontSize: '1.35rem', fontWeight: '600', marginBottom: '0.35rem', color: 'white' }}>
+                      {persona.name}
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                      {persona.relationship}
+                    </p>
+                  </div>
                 </Link>
 
                 <div style={{ 
@@ -332,6 +340,47 @@ export default function DashboardClient({
           </div>
         )}
       </main>
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          .dashboard-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .header-meta {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+          .header-divider {
+            display: none !important;
+          }
+          .user-email {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .persona-card-content {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 1.25rem !important;
+            margin-bottom: 1rem !important;
+          }
+          .persona-avatar-wrapper {
+            margin-bottom: 0 !important;
+          }
+          .persona-info {
+            text-align: ${isRTL ? 'right' : 'left'} !important;
+          }
+          .header-meta {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+          }
+          .usage-container {
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -64,7 +64,7 @@ const MemorialView: React.FC<MemorialViewProps> = ({
   };
 
   return (
-    <div style={{
+    <div className="memorial-container" style={{
       minHeight: '100vh',
       padding: '2rem',
       maxWidth: '1000px',
@@ -75,38 +75,39 @@ const MemorialView: React.FC<MemorialViewProps> = ({
       direction: isRTL ? 'rtl' : 'ltr'
     }}>
       {/* Header */}
-      <header style={{ textAlign: 'center' }}>
-        <Link href="/dashboard" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', display: 'inline-block' }}>
+      <header className="memorial-header" style={{ textAlign: 'center' }}>
+        <Link href="/dashboard" className="back-link" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', display: 'inline-block', textDecoration: 'none' }}>
           {isRTL ? `← ${t('memorial.backToDashboard')}` : `← ${t('memorial.backToDashboard')}`}
         </Link>
-        <div style={{
+        <div className="memorial-avatar" style={{
           width: '120px',
           height: '120px',
           borderRadius: '50%',
           margin: '0 auto 1.5rem',
           border: '4px solid var(--border-color)',
           overflow: 'hidden',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.3)'
+          boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+          background: 'var(--bg-tertiary)'
         }}>
           {persona.avatar_url ? (
             <img src={persona.avatar_url} alt={persona.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
-            <div style={{ width: '100%', height: '100%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
               {persona.name.charAt(0)}
             </div>
           )}
         </div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>{persona.name}</h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+        <h1 className="memorial-name" style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', color: 'white' }}>{persona.name}</h1>
+        <p className="memorial-relationship" style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
           {persona.relationship}
         </p>
       </header>
 
       {/* Main Content Grid */}
-      <div style={{ 
+      <div className="memorial-grid" style={{ 
         display: 'grid', 
         gridTemplateColumns: '1fr 300px', 
-        gap: '2rem',
+        gap: '2.5rem',
         alignItems: 'start'
       }}>
         {/* Left Column: Bio and Tributes */}
@@ -266,6 +267,39 @@ const MemorialView: React.FC<MemorialViewProps> = ({
           </div>
         </div>
       </div>
+      <style jsx global>{`
+        @media (max-width: 900px) {
+          .memorial-grid {
+            grid-template-columns: 1fr !important;
+            gap: 3rem !important;
+          }
+          .memorial-container {
+            padding: 1.5rem !important;
+          }
+          .memorial-avatar {
+            width: 90px !important;
+            height: 90px !important;
+          }
+          .memorial-name {
+            font-size: 1.8rem !important;
+          }
+          .memorial-relationship {
+            font-size: 1rem !important;
+          }
+          .back-link {
+            padding: 0.5rem 1rem !important;
+            background: rgba(255,255,255,0.05) !important;
+            border-radius: 20px !important;
+          }
+          .tribute-submit-btn {
+            align-self: stretch !important;
+            width: 100% !important;
+          }
+          .tribute-card {
+            padding: 1.25rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
