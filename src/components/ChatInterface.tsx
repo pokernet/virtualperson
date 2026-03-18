@@ -156,12 +156,12 @@ export default function ChatInterface({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '1rem 0.5rem 1.5rem 0.5rem',
+        padding: '1.25rem 0.5rem',
         borderBottom: '1px solid var(--border-color)',
-        marginBottom: '1rem',
-        flexDirection: isRTL ? 'row-reverse' : 'row'
+        marginBottom: '1rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+        {/* Left/Start Side Group: Back button and Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <Link href="/dashboard" style={{ 
             color: 'var(--text-secondary)', 
             fontSize: '1.25rem',
@@ -169,56 +169,55 @@ export default function ChatInterface({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '32px',
-            height: '32px',
+            width: '36px',
+            height: '36px',
             borderRadius: '50%',
             background: 'rgba(255, 255, 255, 0.05)',
             transition: 'all 0.2s',
             transform: isRTL ? 'rotate(180deg)' : 'none'
           }} title={t('common.dashboard')}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </Link>
-          <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
+          <div>
             <h1 style={{ fontSize: '1.25rem', fontWeight: '600', margin: 0 }}>{personaName}</h1>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>{t('chat.portalActive')}</p>
           </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <LanguageSwitcher />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+        {/* Right/End Side Group: Persona Tools, Avatar, AND Language Switcher at the very end */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ textAlign: isRTL ? 'left' : 'right' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
-                </div>
-                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: isRTL ? 'flex-start' : 'flex-end', alignItems: 'center', marginTop: '2px' }}>
-                <Link href={`/wizard?id=${personaId}`} style={{ 
-                    fontSize: '0.75rem', 
-                    color: 'var(--accent-primary)',
-                    textDecoration: 'none',
-                    fontWeight: '500',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                }}>
-                    {t('chat.editPersona')}
-                </Link>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}>
+                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
+              </div>
+              <Link href={`/wizard?id=${personaId}`} style={{ 
+                  fontSize: '0.8rem', 
+                  color: 'var(--accent-primary)',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  marginTop: '4px',
+                  display: 'block'
+              }}>
+                  {t('chat.editPersona')}
+              </Link>
             </div>
+
             <div style={{ 
-                width: '44px', 
-                height: '44px', 
+                width: '48px', 
+                height: '48px', 
                 borderRadius: '50%', 
                 background: 'var(--bg-tertiary)', 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center', 
-                fontSize: '1.1rem',
+                fontSize: '1.2rem',
                 fontWeight: '600',
                 border: '2px solid var(--border-color)',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
             }}>
                 {avatarUrl ? (
                 <img src={avatarUrl} alt={personaName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -227,6 +226,8 @@ export default function ChatInterface({
                 )}
             </div>
           </div>
+
+          <LanguageSwitcher />
         </div>
       </header>
 
