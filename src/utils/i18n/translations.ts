@@ -33,7 +33,8 @@ export const translations = {
       noAccount: "Don't have an account?",
       yesAccount: 'Already have an account?',
       error: 'Authentication failed. Please try again.',
-      forgotPassword: 'Forgot Password?'
+      forgotPassword: 'Forgot Password?',
+      signInWithGoogle: 'Sign in with Google'
     },
     forgotPassword: {
       title: 'Reset Password',
@@ -162,7 +163,8 @@ export const translations = {
       noAccount: 'אין לך חשבון?',
       yesAccount: 'כבר יש לך חשבון?',
       error: 'התחברות נכשלה. נסה שוב.',
-      forgotPassword: 'שכחת סיסמה?'
+      forgotPassword: 'שכחת סיסמה?',
+      signInWithGoogle: 'התחבר באמצעות Google'
     },
     forgotPassword: {
       title: 'איפוס סיסמה',
@@ -291,7 +293,8 @@ export const translations = {
       noAccount: 'У вас нет аккаунта?',
       yesAccount: 'Уже есть аккаунт?',
       error: 'Ошибка аутентификации. Пожалуйста, попробуйте снова.',
-      forgotPassword: 'Забыли пароль?'
+      forgotPassword: 'Забыли пароль?',
+      signInWithGoogle: 'Войти через Google'
     },
     forgotPassword: {
       title: 'Сброс пароля',
@@ -381,7 +384,8 @@ export const translations = {
       noAccount: '¿No tienes una cuenta?',
       yesAccount: '¿Ya tienes una cuenta?',
       error: 'Error de autenticación. Inténtalo de nuevo.',
-      forgotPassword: '¿Olvidaste tu contraseña?'
+      forgotPassword: '¿Olvidaste tu contraseña?',
+      signInWithGoogle: 'Iniciar sesión con Google'
     },
     forgotPassword: {
       title: 'Restablecer contraseña',
@@ -471,7 +475,8 @@ export const translations = {
       noAccount: 'Vous n\'avez pas de compte ?',
       yesAccount: 'Vous avez déjà un compte ?',
       error: 'Échec de l\'authentification. Veuillez réessayer.',
-      forgotPassword: 'Mot de passe oublié ?'
+      forgotPassword: 'Mot de passe oublié ?',
+      signInWithGoogle: 'Se connecter avec Google'
     },
     forgotPassword: {
       title: 'Réinitialiser le mot de passe',
@@ -561,7 +566,8 @@ export const translations = {
       noAccount: 'Haben Sie noch kein Konto?',
       yesAccount: 'Haben Sie bereits ein Konto?',
       error: 'Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
-      forgotPassword: 'Passwort vergessen?'
+      forgotPassword: 'Passwort vergessen?',
+      signInWithGoogle: 'Mit Google anmelden'
     },
     forgotPassword: {
       title: 'Passwort zurücksetzen',

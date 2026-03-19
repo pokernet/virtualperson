@@ -87,3 +87,28 @@ export async function updatePassword(formData: FormData) {
 
   return redirect('/login?error=' + encodeURIComponent('Password updated successfully. You can now login.'))
 }
+
+export async function signInWithGoogle() {
+  const supabase = await createClient()
+  
+  // Get the base URL from headers for the redirect
+  const { headers } = await import('next/headers')
+  const host = (await headers()).get('host')
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+  const redirectTo = `${protocol}://${host}/auth/callback?next=/dashboard`
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+    },
+  })
+
+  if (error) {
+    return redirect('/login?error=' + encodeURIComponent(error.message))
+  }
+
+  if (data.url) {
+    redirect(data.url)
+  }
+}
