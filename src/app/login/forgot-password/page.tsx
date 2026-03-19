@@ -1,16 +1,17 @@
 'use client';
 
-import { login, signup } from './actions'
+import { requestPasswordReset } from '../actions'
 import { useLanguage } from '@/utils/i18n/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 
-function LoginForm() {
+function ForgotPasswordForm() {
   const { t, isRTL } = useLanguage();
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+  const success = searchParams.get('success');
 
   return (
     <main className="glass-panel" style={{
@@ -33,9 +34,9 @@ function LoginForm() {
           WebkitTextFillColor: 'transparent',
           marginBottom: '0.5rem'
         }}>
-          {t('login.welcome')}
+          {t('forgotPassword.title')}
         </h1>
-        <p style={{ color: 'var(--text-secondary)' }}>{t('login.subtitle')}</p>
+        <p style={{ color: 'var(--text-secondary)' }}>{t('forgotPassword.subtitle')}</p>
       </div>
 
       {error && (
@@ -46,17 +47,33 @@ function LoginForm() {
           color: '#fb7185',
           borderRadius: '12px',
           fontSize: '0.875rem',
-          textAlign: 'center',
-          animation: 'fadeIn 0.3s ease'
+          textAlign: 'center'
         }}>
           {error}
         </div>
       )}
 
-      <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {success ? (
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{
+                padding: '1rem',
+                background: 'rgba(74, 222, 128, 0.1)',
+                border: '1px solid rgba(74, 222, 128, 0.2)',
+                color: '#4ade80',
+                borderRadius: '12px',
+                fontSize: '0.9rem'
+            }}>
+                {t('forgotPassword.success')}
+            </div>
+            <Link href="/login" className="btn-secondary" style={{ width: '100%' }}>
+                {t('forgotPassword.backToLogin')}
+            </Link>
+        </div>
+      ) : (
+        <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label htmlFor="email" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              {t('login.emailLabel')}
+              {t('forgotPassword.emailLabel')}
             </label>
             <input
               id="email"
@@ -72,64 +89,32 @@ function LoginForm() {
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
                 outline: 'none',
-                transition: 'border-color 0.2s ease',
                 textAlign: 'inherit'
               }}
             />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label htmlFor="password" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              {t('login.passwordLabel')}
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              placeholder="••••••••"
-              style={{
-                width: '100%',
-                padding: '0.875rem 1rem',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                transition: 'border-color 0.2s ease',
-                textAlign: 'inherit'
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: isRTL ? 'flex-start' : 'flex-end', marginTop: '-0.5rem' }}>
-            <Link 
-              href="/login/forgot-password" 
-              style={{ 
-                fontSize: '0.85rem', 
-                color: 'var(--accent-primary)', 
-                textDecoration: 'none',
-                fontWeight: '500'
-              }}
-            >
-              {t('login.forgotPassword')}
-            </Link>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
-            <button formAction={login} className="btn-primary" style={{ width: '100%' }}>
-              {t('login.signIn')}
+            <button formAction={requestPasswordReset} className="btn-primary" style={{ width: '100%' }}>
+              {t('forgotPassword.sendButton')}
             </button>
-            <button formAction={signup} className="btn-secondary" style={{ width: '100%' }}>
-              {t('login.signUp')}
-            </button>
+            <Link href="/login" style={{ 
+                textAlign: 'center', 
+                fontSize: '0.9rem', 
+                color: 'var(--text-muted)', 
+                textDecoration: 'none',
+                marginTop: '0.5rem'
+            }}>
+                {t('forgotPassword.backToLogin')}
+            </Link>
           </div>
         </form>
-      </main>
-    );
+      )}
+    </main>
+  );
 }
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const { isRTL } = useLanguage();
 
   return (
@@ -139,9 +124,9 @@ export default function LoginPage() {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '2rem',
-      position: 'relative'
+      position: 'relative',
+      direction: isRTL ? 'rtl' : 'ltr'
     }}>
-      {/* Top Header with Switcher */}
       <header style={{
         position: 'absolute',
         top: '2rem',
@@ -151,7 +136,6 @@ export default function LoginPage() {
         <LanguageSwitcher />
       </header>
 
-      {/* Subtle Background Glow */}
       <div style={{
         position: 'absolute',
         top: '50%',
@@ -166,9 +150,8 @@ export default function LoginPage() {
       }} />
 
       <Suspense fallback={null}>
-        <LoginForm />
+        <ForgotPasswordForm />
       </Suspense>
     </div>
   )
 }
-

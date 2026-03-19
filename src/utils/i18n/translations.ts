@@ -11,7 +11,7 @@ export const translations = {
       editProfile: 'Edit Profile',
       createProfile: 'Create Profile',
       delete: 'Delete',
-      poweredBy: 'Powered by GPT-4o',
+      poweredBy: 'Power by AI',
       loading: 'Loading...',
       saving: 'Saving Profile...'
     },
@@ -20,6 +20,7 @@ export const translations = {
       subtitle: 'Create an AI embodiment of a loved one that speaks, remembers, and comforts—a bridge between past and present.',
       getStarted: 'Get Started',
       login: 'Login to your account',
+      viewMemorials: 'Browse Public Memorials',
       footer: 'Designed with love and serenity for your most precious memories.'
     },
     login: {
@@ -31,7 +32,21 @@ export const translations = {
       signUp: 'Sign Up',
       noAccount: "Don't have an account?",
       yesAccount: 'Already have an account?',
-      error: 'Authentication failed. Please try again.'
+      error: 'Authentication failed. Please try again.',
+      forgotPassword: 'Forgot Password?'
+    },
+    forgotPassword: {
+      title: 'Reset Password',
+      subtitle: 'Enter your email to receive a password reset link.',
+      emailLabel: 'Email Address',
+      sendButton: 'Send Reset Link',
+      success: 'Check your email for the reset link.',
+      backToLogin: 'Back to Login',
+      newPasswordTitle: 'Set New Password',
+      newPasswordSubtitle: 'Create a strong new password for your account.',
+      newPasswordLabel: 'New Password',
+      updateButton: 'Update Password',
+      updateSuccess: 'Password updated successfully. You can now login.'
     },
     dashboard: {
       title: 'Your Connections',
@@ -125,7 +140,7 @@ export const translations = {
       editProfile: 'ערוך פרופיל',
       createProfile: 'צור פרופיל',
       delete: 'מחק',
-      poweredBy: 'מופעל על ידי GPT-4o',
+      poweredBy: 'מופעל על ידי בינה מלאכותית',
       loading: 'טוען...',
       saving: 'שומר פרופיל...'
     },
@@ -134,6 +149,7 @@ export const translations = {
       subtitle: 'צרו התגלמות בינה מלאכותית של אדם אהוב שמדברת, זוכרת ומנחמת - גשר בין העבר להווה.',
       getStarted: 'מתחילים כאן',
       login: 'התחבר לחשבונך',
+      viewMemorials: 'צפייה בדפי זיכרון ציבוריים',
       footer: 'עוצב באהבה וברוגע עבור הזכרונות היקרים ביותר שלכם.'
     },
     login: {
@@ -145,7 +161,21 @@ export const translations = {
       signUp: 'הרשם',
       noAccount: 'אין לך חשבון?',
       yesAccount: 'כבר יש לך חשבון?',
-      error: 'התחברות נכשלה. נסה שוב.'
+      error: 'התחברות נכשלה. נסה שוב.',
+      forgotPassword: 'שכחת סיסמה?'
+    },
+    forgotPassword: {
+      title: 'איפוס סיסמה',
+      subtitle: 'הזן את הדוא"ל שלך כדי לקבל קישור לאיפוס סיסמה.',
+      emailLabel: 'כתובת אימייל',
+      sendButton: 'שלח קישור לאיפוס',
+      success: 'בדוק את הדוא"ל שלך לקבלת הקישור לאיפוס.',
+      backToLogin: 'חזור להתחברות',
+      newPasswordTitle: 'קבע סיסמה חדשה',
+      newPasswordSubtitle: 'צור סיסמה חדשה וחזקה עבור החשבון שלך.',
+      newPasswordLabel: 'סיסמה חדשה',
+      updateButton: 'עדכן סיסמה',
+      updateSuccess: 'הסיסמה עודכנה בהצלחה. כעת תוכל להתחבר.'
     },
     dashboard: {
       title: 'הקשרים שלך',
@@ -239,7 +269,7 @@ export const translations = {
       editProfile: 'Изменить профиль',
       createProfile: 'Создать профиль',
       delete: 'Удалить',
-      poweredBy: 'Работает на GPT-4o',
+      poweredBy: 'Работает на ИИ',
       loading: 'Загрузка...',
       saving: 'Сохранение профиля...'
     },
@@ -248,6 +278,7 @@ export const translations = {
       subtitle: 'Создайте ИИ-воплощение близкого человека, которое говорит, помнит и утешает — мост между прошлым и настоящим.',
       getStarted: 'Начать',
       login: 'Войти в аккаунт',
+      viewMemorials: 'Публичные мемориалы',
       footer: 'Создано с любовью и спокойствием для ваших самых драгоценных воспоминаний.'
     },
     login: {
@@ -259,7 +290,21 @@ export const translations = {
       signUp: 'Зарегистрироваться',
       noAccount: 'У вас нет аккаунта?',
       yesAccount: 'Уже есть аккаунт?',
-      error: 'Ошибка аутентификации. Пожалуйста, попробуйте снова.'
+      error: 'Ошибка аутентификации. Пожалуйста, попробуйте снова.',
+      forgotPassword: 'Забыли пароль?'
+    },
+    forgotPassword: {
+      title: 'Сброс пароля',
+      subtitle: 'Введите адрес электронной почты, чтобы получить ссылку для сброса пароля.',
+      emailLabel: 'Электронная почта',
+      sendButton: 'Отправить ссылку',
+      success: 'Проверьте свою электронную почту на наличие ссылки для сброса.',
+      backToLogin: 'Вернуться к входу',
+      newPasswordTitle: 'Установить новый пароль',
+      newPasswordSubtitle: 'Создайте надежный новый пароль для вашей учетной записи.',
+      newPasswordLabel: 'Новый пароль',
+      updateButton: 'Обновить пароль',
+      updateSuccess: 'Пароль успешно обновлен. Теперь вы можете войти.'
     },
     dashboard: {
       title: 'Ваши связи',
@@ -314,7 +359,7 @@ export const translations = {
       editProfile: 'Editar perfil',
       createProfile: 'Crear perfil',
       delete: 'Eliminar',
-      poweredBy: 'Impulsado por GPT-4o',
+      poweredBy: 'Impulsado por IA',
       loading: 'Cargando...',
       saving: 'Guardando perfil...'
     },
@@ -323,6 +368,7 @@ export const translations = {
       subtitle: 'Crea una encarnación de IA de un ser querido que habla, recuerda y consuela: un puente entre el pasado y el presente.',
       getStarted: 'Empezar',
       login: 'Iniciar sesión en tu cuenta',
+      viewMemorials: 'Explorar Memoriales Públicos',
       footer: 'Diseñado con amor y serenidad para tus recuerdos más preciosos.'
     },
     login: {
@@ -334,7 +380,21 @@ export const translations = {
       signUp: 'Registrarse',
       noAccount: '¿No tienes una cuenta?',
       yesAccount: '¿Ya tienes una cuenta?',
-      error: 'Error de autenticación. Inténtalo de nuevo.'
+      error: 'Error de autenticación. Inténtalo de nuevo.',
+      forgotPassword: '¿Olvidaste tu contraseña?'
+    },
+    forgotPassword: {
+      title: 'Restablecer contraseña',
+      subtitle: 'Ingrese su correo electrónico para recibir un enlace de restablecimiento.',
+      emailLabel: 'Correo electrónico',
+      sendButton: 'Enviar enlace',
+      success: 'Revise su correo electrónico para ver el enlace de restablecimiento.',
+      backToLogin: 'Volver al inicio de sesión',
+      newPasswordTitle: 'Establecer nueva contraseña',
+      newPasswordSubtitle: 'Cree una nueva contraseña segura para su cuenta.',
+      newPasswordLabel: 'Nueva contraseña',
+      updateButton: 'Actualizar contraseña',
+      updateSuccess: 'Contraseña actualizada con éxito. Ahora puede iniciar sesión.'
     },
     dashboard: {
       title: 'Tus Conexiones',
@@ -389,7 +449,7 @@ export const translations = {
       editProfile: 'Modifier le profil',
       createProfile: 'Créer un profil',
       delete: 'Supprimer',
-      poweredBy: 'Propulsé par GPT-4o',
+      poweredBy: 'Propulsé par l\'IA',
       loading: 'Chargement...',
       saving: 'Enregistrement du profil...'
     },
@@ -398,6 +458,7 @@ export const translations = {
       subtitle: 'Créez une incarnation IA d\'un être cher qui parle, se souvient et réconforte — un pont entre le passé et le présent.',
       getStarted: 'Commencer',
       login: 'Connexion à votre compte',
+      viewMemorials: 'Parcourir les mémoriaux publics',
       footer: 'Conçu avec amour et sérénité pour vos souvenirs les plus précieux.'
     },
     login: {
@@ -409,7 +470,21 @@ export const translations = {
       signUp: 'S\'inscrire',
       noAccount: 'Vous n\'avez pas de compte ?',
       yesAccount: 'Vous avez déjà un compte ?',
-      error: 'Échec de l\'authentification. Veuillez réessayer.'
+      error: 'Échec de l\'authentification. Veuillez réessayer.',
+      forgotPassword: 'Mot de passe oublié ?'
+    },
+    forgotPassword: {
+      title: 'Réinitialiser le mot de passe',
+      subtitle: 'Entrez votre e-mail pour recevoir un lien de réinitialisation.',
+      emailLabel: 'Adresse e-mail',
+      sendButton: 'Envoyer le lien',
+      success: 'Vérifiez votre e-mail pour le lien de réinitialisation.',
+      backToLogin: 'Retour à la connexion',
+      newPasswordTitle: 'Définir un nouveau mot de passe',
+      newPasswordSubtitle: 'Créez un nouveau mot de passe fort pour votre compte.',
+      newPasswordLabel: 'Nouveau mot de passe',
+      updateButton: 'Mettre à jour le mot de passe',
+      updateSuccess: 'Mot de passe mis à jour avec succès. Vous pouvez maintenant vous connecter.'
     },
     dashboard: {
       title: 'Vos Connexions',
@@ -464,7 +539,7 @@ export const translations = {
       editProfile: 'Profil bearbeiten',
       createProfile: 'Profil erstellen',
       delete: 'Löschen',
-      poweredBy: 'Unterstützt von GPT-4o',
+      poweredBy: 'Unterstützt von KI',
       loading: 'Laden...',
       saving: 'Profil wird gespeichert...'
     },
@@ -473,6 +548,7 @@ export const translations = {
       subtitle: 'Erschaffen Sie eine KI-Verkörperung eines geliebten Menschen, die spricht, sich erinnert und tröstet – eine Brücke zwischen Vergangenheit und Gegenwart.',
       getStarted: 'Jetzt starten',
       login: 'In Ihr Konto einloggen',
+      viewMemorials: 'Öffentliche Gedenkstätten durchsuchen',
       footer: 'Mit Liebe und Gelassenheit für Ihre kostbarsten Erinnerungen entworfen.'
     },
     login: {
@@ -484,7 +560,21 @@ export const translations = {
       signUp: 'Registrieren',
       noAccount: 'Haben Sie noch kein Konto?',
       yesAccount: 'Haben Sie bereits ein Konto?',
-      error: 'Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.'
+      error: 'Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+      forgotPassword: 'Passwort vergessen?'
+    },
+    forgotPassword: {
+      title: 'Passwort zurücksetzen',
+      subtitle: 'Geben Sie Ihre E-Mail ein, um einen Link zum Zurücksetzen des Passworts zu erhalten.',
+      emailLabel: 'E-Mail-Adresse',
+      sendButton: 'Link senden',
+      success: 'Überprüfen Sie Ihre E-Mail auf den Link zum Zurücksetzen.',
+      backToLogin: 'Zurück zum Login',
+      newPasswordTitle: 'Neues Passwort festlegen',
+      newPasswordSubtitle: 'Erstellen Sie ein starkes neues Passwort für Ihr Konto.',
+      newPasswordLabel: 'Neues Passwort',
+      updateButton: 'Passwort aktualisieren',
+      updateSuccess: 'Passwort erfolgreich aktualisiert. Sie können sich jetzt anmelden.'
     },
     dashboard: {
       title: 'Ihre Verbindungen',
