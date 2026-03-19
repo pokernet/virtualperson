@@ -19,6 +19,8 @@ export async function createPersona(formData: FormData) {
     const traits = formData.get('traits') as string
     const catchphrases = formData.get('catchphrases') as string
     const memories = formData.get('memories') as string
+    const age = formData.get('age') ? parseInt(formData.get('age') as string) : null
+    const sex = formData.get('sex') as string | null
     
     const avatarFile = formData.get('avatar') as File | null
     let avatarUrl = formData.get('existing_avatar_url') as string | null
@@ -50,6 +52,8 @@ export async function createPersona(formData: FormData) {
     // Construct the core AI Identity (System Prompt)
     const systemPrompt = `
 You are an AI embodiment of a person named ${name}. 
+${age ? `You are ${age} years old.` : ''}
+${sex ? `Your biological sex/gender is ${sex}.` : ''}
 The person talking to you is your ${relationship}. 
 Your personality traits are: ${traits}. 
 Some of your favorite catchphrases or ways of speaking include: ${catchphrases}.
@@ -77,7 +81,9 @@ INSTRUCTIONS:
             catchphrases,
             memories,
             system_prompt: systemPrompt,
-            avatar_url: avatarUrl
+            avatar_url: avatarUrl,
+            age,
+            sex
         })
         .eq('id', id)
         .eq('user_id', user.id)
@@ -96,7 +102,9 @@ INSTRUCTIONS:
             catchphrases,
             memories,
             system_prompt: systemPrompt,
-            avatar_url: avatarUrl
+            avatar_url: avatarUrl,
+            age,
+            sex
             }
         ])
         .select()

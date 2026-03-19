@@ -5,6 +5,7 @@ import { logout } from '@/app/login/actions';
 import { useLanguage } from '@/utils/i18n/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UsageStatus from '@/components/UsageStatus';
+import AnimatedAvatar from '@/components/AnimatedAvatar';
 
 interface Persona {
   id: string;
@@ -13,6 +14,8 @@ interface Persona {
   created_at: string;
   avatar_url: string | null;
   is_public: boolean;
+  age?: number | null;
+  sex?: string | null;
 }
 
 interface Profile {
@@ -176,26 +179,16 @@ export default function DashboardClient({
               }}>
                 <Link href={`/chat/${persona.id}`} className="persona-card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div className="persona-avatar-wrapper" style={{ 
-                    width: '56px', 
-                    height: '56px', 
-                    borderRadius: '16px', 
-                    background: 'var(--bg-tertiary)',
                     marginBottom: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.4rem',
-                    color: 'var(--text-secondary)',
-                    overflow: 'hidden',
-                    border: '1px solid var(--border-color)',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                     flexShrink: 0
                   }}>
-                    {persona.avatar_url ? (
-                      <img src={persona.avatar_url} alt={persona.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      persona.name.charAt(0).toUpperCase()
-                    )}
+                    <AnimatedAvatar 
+                      src={persona.avatar_url} 
+                      name={persona.name} 
+                      age={persona.age} 
+                      sex={persona.sex} 
+                      size={56} 
+                    />
                   </div>
                   <div className="persona-info">
                     <h3 style={{ fontSize: '1.35rem', fontWeight: '600', marginBottom: '0.35rem', color: 'white' }}>

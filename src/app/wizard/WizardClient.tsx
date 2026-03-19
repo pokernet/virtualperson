@@ -14,6 +14,8 @@ interface PersonaData {
   catchphrases: string;
   memories: string;
   avatar_url?: string;
+  age?: number;
+  sex?: string;
 }
 
 export default function WizardClient({ 
@@ -106,6 +108,59 @@ export default function WizardClient({
           {/* Hidden ID input for updates */}
           {isEditing && <input type="hidden" name="id" value={personaData.id} />}
           {isEditing && <input type="hidden" name="existing_avatar_url" value={personaData.avatar_url || ''} />}
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label htmlFor="age" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                {t('wizard.ageLabel') || 'Age'}
+              </label>
+              <input
+                id="age"
+                name="age"
+                type="number"
+                min="0"
+                max="120"
+                defaultValue={personaData?.age || ''}
+                placeholder="e.g. 25"
+                style={{
+                  width: '100%',
+                  padding: '0.875rem 1rem',
+                  borderRadius: '12px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label htmlFor="sex" style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                {t('wizard.sexLabel') || 'Sex'}
+              </label>
+              <select
+                id="sex"
+                name="sex"
+                defaultValue={personaData?.sex || ''}
+                style={{
+                  width: '100%',
+                  padding: '0.875rem 1rem',
+                  borderRadius: '12px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                  appearance: 'none',
+                  backgroundColor: 'var(--bg-tertiary)'
+                }}
+              >
+                <option value="">{t('common.select') || 'Select'}</option>
+                <option value="male">{t('common.male') || 'Male'}</option>
+                <option value="female">{t('common.female') || 'Female'}</option>
+                <option value="other">{t('common.other') || 'Other'}</option>
+              </select>
+            </div>
+          </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
             <div 

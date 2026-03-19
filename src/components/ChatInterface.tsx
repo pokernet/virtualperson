@@ -5,6 +5,7 @@ import { useChat } from '@ai-sdk/react';
 import Link from 'next/link';
 import { useLanguage } from '@/utils/i18n/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import AnimatedAvatar from '@/components/AnimatedAvatar';
 
 // Define Message type since we can't get it from ai/react easily
 export interface Message {
@@ -18,6 +19,8 @@ interface ChatInterfaceProps {
   personaName: string;
   avatarUrl?: string;
   systemPrompt: string;
+  age?: number | null;
+  sex?: string | null;
   initialMessages?: Message[];
 }
 
@@ -26,6 +29,8 @@ export default function ChatInterface({
   personaName, 
   avatarUrl,
   systemPrompt, 
+  age,
+  sex,
   initialMessages = [] 
 }: ChatInterfaceProps) {
   const { t, isRTL } = useLanguage();
@@ -233,27 +238,14 @@ export default function ChatInterface({
               </Link>
             </div>
 
-            <div style={{ 
-                width: '42px', 
-                height: '42px', 
-                borderRadius: '12px', 
-                background: 'var(--bg-tertiary)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                border: '1px solid var(--border-color)',
-                overflow: 'hidden',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                flexShrink: 0
-            }}>
-                {avatarUrl ? (
-                <img src={avatarUrl} alt={personaName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                    personaName.charAt(0).toUpperCase()
-                )}
-            </div>
+            <AnimatedAvatar 
+              src={avatarUrl} 
+              name={personaName} 
+              age={age} 
+              sex={sex} 
+              size={42} 
+              isTalking={isLoading} 
+            />
           </div>
 
           <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-color)', margin: '0 0.25rem' }} />
@@ -294,29 +286,14 @@ export default function ChatInterface({
             animation: 'fadeIn 0.5s ease forwards'
           }}>
             {/* Avatar */}
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: m.role === 'user' ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '0.8rem',
-              fontWeight: '600',
-              flexShrink: 0,
-              boxShadow: 'var(--shadow-glow)',
-              overflow: 'hidden',
-              border: m.role === 'assistant' ? '1px solid var(--border-color)' : 'none'
-            }}>
-              {m.role === 'user' ? 'U' : (
-                avatarUrl ? (
-                   <img src={avatarUrl} alt={personaName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  personaName.charAt(0)
-                )
-              )}
-            </div>
+            <AnimatedAvatar 
+              src={m.role === 'user' ? null : avatarUrl} 
+              name={m.role === 'user' ? 'Me' : personaName} 
+              age={m.role === 'user' ? null : age} 
+              sex={m.role === 'user' ? null : sex} 
+              size={40} 
+              isTalking={m.role === 'assistant' && isLoading && m.id === messages[messages.length - 1]?.id} 
+            />
 
             {/* Message Bubble */}
             <div style={{

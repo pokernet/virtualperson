@@ -74,6 +74,8 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
         personaName={persona.name} 
         avatarUrl={persona.avatar_url}
         systemPrompt={persona.system_prompt} 
+        age={persona.age}
+        sex={persona.sex}
         initialMessages={initialMessages}
       />
     </div>
