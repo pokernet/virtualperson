@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       try {
         chatId = await getOrCreateChat(personaId, user.id);
         const lastUserMsg = normalizedMessages[normalizedMessages.length - 1];
-        if (lastUserMsg?.role === 'user' && lastUserMsg.content) {
+        if (lastUserMsg?.role === 'user' && lastUserMsg.content && chatId) {
           await saveMessage(chatId, 'user', lastUserMsg.content);
         }
       } catch (err) {
