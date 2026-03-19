@@ -29,11 +29,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // AI SDK v3 sends { messages, id } — extra fields like systemPrompt/personaId
-    // are passed via the `body` option in useChat, merged at top level.
     let { messages, systemPrompt, modelPref, personaId } = body;
 
-    // Fallback: check last message metadata (v3 pattern)
     const lastMessage = messages?.[messages.length - 1];
     if (!personaId && lastMessage?.metadata?.personaId) {
       personaId = lastMessage.metadata.personaId;
@@ -59,31 +56,35 @@ export async function POST(req: Request) {
     // Token Limit Check
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('openai_tokens, anthropic_tokens, local_tokens, max_openai_tokens, max_anthropic_tokens, max_local_tokens')
+      .select('*')
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile) {
-      console.error('Profile error:', profileError);
-      // Don't block chat if profile check fails — just skip token enforcement
-    } else {
-      const modelType = modelPref === 'anthropic' ? 'anthropic' :
-                       modelPref === 'local' ? 'local' : 'openai';
+    let tokenLimitExceeded = false;
+    let tokenLimitMessage = '';
+    const modelType = modelPref === 'anthropic' ? 'anthropic' :
+                     modelPref === 'local' ? 'local' : 'openai';
+
+    if (!profileError && profile) {
       const currentTokens = (profile as any)[`${modelType}_tokens`] as number || 0;
-      const maxTokens = (profile as any)[`max_${modelType}_tokens`] as number || 100000;
+      const maxTokens = (profile as any)[`max_${modelType}_tokens`] as number || 1000000;
 
       if (currentTokens >= maxTokens) {
-        return new Response(JSON.stringify({
-          error: 'Token limit exceeded',
-          message: `You have reached your ${modelType} token limit (${maxTokens}). Please contact an administrator.`
-        }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        tokenLimitExceeded = true;
+        tokenLimitMessage = `You have reached your ${modelType} token limit (${maxTokens}). Please contact an administrator.`;
       }
     }
 
-    // Normalize messages — AI SDK v3 uses 'parts' instead of 'content' in some cases
+    if (tokenLimitExceeded) {
+      return new Response(JSON.stringify({
+        error: 'Token limit exceeded',
+        message: tokenLimitMessage
+      }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const normalizedMessages = messages.map((m: any) => {
       let content = m.content || '';
       if (!content && m.parts) {
@@ -97,50 +98,46 @@ export async function POST(req: Request) {
 
     const model = resolveAiModel(modelPref || (process.env.AI_MODEL_PREFERENCE as string));
 
-    // Save user message to Supabase
+    let chatId: string | null = null;
     if (personaId) {
       try {
-        const chatId = await getOrCreateChat(personaId, user.id);
+        chatId = await getOrCreateChat(personaId, user.id);
         const lastUserMsg = normalizedMessages[normalizedMessages.length - 1];
         if (lastUserMsg?.role === 'user' && lastUserMsg.content) {
           await saveMessage(chatId, 'user', lastUserMsg.content);
         }
-
-        const result = streamText({
-          model,
-          messages: normalizedMessages,
-          system: systemPrompt,
-          temperature: 0.7,
-          onFinish: async (event) => {
-            await saveMessage(chatId, 'assistant', event.text);
-            if (event.usage && profile) {
-              const totalTokens = event.usage.totalTokens || 0;
-              const column = modelPref === 'anthropic' ? 'anthropic_tokens' :
-                            modelPref === 'local' ? 'local_tokens' : 'openai_tokens';
-              const currentTokens = (profile as any)[column] as number || 0;
-              await supabase
-                .from('profiles')
-                .update({ [column]: currentTokens + totalTokens })
-                .eq('id', user.id);
-            }
-          }
-        });
-
-        return result.toDataStreamResponse();
       } catch (err) {
-        console.error('Chat with persona error:', err);
+        console.error('Error saving user message:', err);
       }
     }
 
-    // Fallback: stream without saving
     const result = streamText({
       model,
       messages: normalizedMessages,
       system: systemPrompt,
       temperature: 0.7,
+      onFinish: async (event) => {
+        if (chatId) {
+          await saveMessage(chatId, 'assistant', event.text);
+        }
+        
+        if (event.usage && profile) {
+          const totalTokens = event.usage.totalTokens || 0;
+          const column = modelType === 'anthropic' ? 'anthropic_tokens' :
+                        modelType === 'local' ? 'local_tokens' : 'openai_tokens';
+          const currentTokens = (profile as any)[column] as number || 0;
+          
+          await supabase
+            .from('profiles')
+            .update({ [column]: currentTokens + totalTokens })
+            .eq('id', user.id);
+        }
+      }
     });
 
-    return result.toDataStreamResponse();
+    // For AI SDK v6, use toUIMessageStreamResponse() which provides the structured format
+    // needed by the useChat hook. Fallback to toTextStreamResponse if needed.
+    return (result as any).toUIMessageStreamResponse?.() || (result as any).toTextStreamResponse?.();
 
   } catch (err) {
     console.error('Chat API Error:', err);
