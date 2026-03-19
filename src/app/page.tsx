@@ -40,7 +40,7 @@ export default function Home() {
       }} />
 
       {/* Navigation Header */}
-      <header style={{
+      <header className="nav-header" style={{
         padding: '1.5rem 2rem',
         display: 'flex',
         justifyContent: 'space-between',
@@ -71,12 +71,13 @@ export default function Home() {
             textTransform: 'uppercase'
           }}>BETA</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+        <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <Link href="/public" style={{ 
             fontSize: '0.95rem', 
             color: 'var(--text-secondary)',
             fontWeight: '500',
-            transition: 'color 0.2s ease'
+            transition: 'color 0.2s ease',
+            textAlign: 'center'
           }} className="nav-link">
             {t('landing.viewMemorials')}
           </Link>
@@ -191,6 +192,16 @@ export default function Home() {
           flex-direction: row;
         }
         @media (max-width: 640px) {
+          .nav-header {
+            padding: 1rem !important;
+            flex-direction: column !important;
+            gap: 1rem !important;
+          }
+          .nav-actions {
+            width: 100%;
+            justify-content: space-between !important;
+            gap: 1rem !important;
+          }
           .cta-container {
             flex-direction: column;
             width: 100%;
