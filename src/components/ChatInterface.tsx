@@ -189,16 +189,27 @@ export default function ChatInterface({
           </Link>
           
           <div style={{ minWidth: 0, overflow: 'hidden' }}>
-            <h1 style={{ 
-              fontSize: '1.15rem', 
-              fontWeight: '600', 
-              margin: 0, 
-              whiteSpace: 'nowrap', 
-              overflow: 'hidden', 
-              textOverflow: 'ellipsis' 
-            }}>
-              {personaName}
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <h1 style={{ 
+                fontSize: '1.15rem', 
+                fontWeight: '600', 
+                margin: 0, 
+                whiteSpace: 'nowrap', 
+                overflow: 'hidden', 
+                textOverflow: 'ellipsis' 
+              }}>
+                {personaName}
+              </h1>
+              <span style={{ 
+                fontSize: '0.6rem', 
+                fontWeight: '700', 
+                background: 'rgba(255,255,255,0.1)', 
+                color: 'var(--text-secondary)', 
+                padding: '1px 4px', 
+                borderRadius: '4px',
+                border: '1px solid var(--border-color)'
+              }}>BETA</span>
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '2px' }}>
               <div style={{ 
                 width: '6px', 

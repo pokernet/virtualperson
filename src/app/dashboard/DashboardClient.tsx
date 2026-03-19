@@ -56,7 +56,19 @@ export default function DashboardClient({
         flexWrap: 'wrap'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>{t('dashboard.title')}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>{t('dashboard.title')}</h1>
+            <span style={{ 
+              fontSize: '0.7rem', 
+              fontWeight: '700', 
+              background: 'var(--accent-primary)', 
+              color: 'white', 
+              padding: '2px 6px', 
+              borderRadius: '6px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>BETA</span>
+          </div>
           <div className="header-divider" style={{ height: '1.5rem', width: '1px', background: 'var(--border-color)' }} />
           <Link href="/public" style={{ 
             fontSize: '0.9rem', 

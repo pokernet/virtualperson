@@ -50,15 +50,26 @@ export default function Home() {
         borderBottom: '1px solid var(--border-color)',
         zIndex: 10
       }}>
-        <div style={{ 
-          fontSize: '1.5rem', 
-          fontWeight: '800', 
-          letterSpacing: '-0.02em',
-          background: 'linear-gradient(135deg, #fff, rgba(255,255,255,0.7))',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}>
-          Eternity AI
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ 
+            fontSize: '1.5rem', 
+            fontWeight: '800', 
+            letterSpacing: '-0.02em',
+            background: 'linear-gradient(135deg, #fff, rgba(255,255,255,0.7))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Eternity AI
+          </div>
+          <span style={{ 
+            fontSize: '0.65rem', 
+            fontWeight: '700', 
+            background: 'var(--accent-primary)', 
+            color: 'white', 
+            padding: '2px 6px', 
+            borderRadius: '6px',
+            textTransform: 'uppercase'
+          }}>BETA</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <Link href="/public" style={{ 
