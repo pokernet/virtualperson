@@ -139,7 +139,11 @@ export async function POST(req: Request) {
     }
   });
   
-  return (result as any).toUIMessageStreamResponse();
+  return (result as any).toDataStreamResponse();
+}
+
+export async function GET() {
+  return new Response('API is operational. Use POST to interact.', { status: 200 });
 }
 
 

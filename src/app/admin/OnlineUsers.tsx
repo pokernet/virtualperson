@@ -61,13 +61,27 @@ export default function OnlineUsers() {
             }}>
               <div style={{ fontWeight: '600' }}>{user.name}</div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{user.email}</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                Online since: {new Date(user.online_at).toLocaleTimeString()}
-              </div>
+              <TimeDisplay time={user.online_at} />
             </div>
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function TimeDisplay({ time }: { time: string }) {
+  const [formattedTime, setFormattedTime] = useState<string>('');
+
+  useEffect(() => {
+    setFormattedTime(new Date(time).toLocaleTimeString());
+  }, [time]);
+
+  if (!formattedTime) return null;
+
+  return (
+    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+      Online since: {formattedTime}
     </div>
   );
 }
