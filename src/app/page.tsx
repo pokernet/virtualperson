@@ -3,9 +3,16 @@
 import Link from 'next/link';
 import { useLanguage } from '@/utils/i18n/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useEffect } from 'react';
+import { trackVisitor } from '@/app/actions/tracking';
 
 export default function Home() {
   const { t } = useLanguage();
+
+  useEffect(() => {
+    // Only track once per session mount to avoid double counting on react strict mode
+    trackVisitor();
+  }, []);
 
   return (
     <div style={{

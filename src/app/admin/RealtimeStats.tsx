@@ -7,23 +7,26 @@ export default function RealtimeStats() {
   const [stats, setStats] = useState({
     userCount: 0,
     personaCount: 0,
-    messageCount: 0
+    messageCount: 0,
+    visitorCount: 0
   });
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
   useEffect(() => {
     const fetchInitialStats = async () => {
-      const [{ count: uCount }, { count: pCount }, { count: mCount }] = await Promise.all([
+      const [{ count: uCount }, { count: pCount }, { count: mCount }, { data: siteStats }] = await Promise.all([
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('ai_personas').select('*', { count: 'exact', head: true }),
-        supabase.from('messages').select('*', { count: 'exact', head: true })
+        supabase.from('messages').select('*', { count: 'exact', head: true }),
+        supabase.from('site_stats').select('total_visitors').eq('id', 1).single()
       ]);
 
       setStats({
         userCount: uCount || 0,
         personaCount: pCount || 0,
-        messageCount: mCount || 0
+        messageCount: mCount || 0,
+        visitorCount: siteStats?.total_visitors || 0
       });
       setLoading(false);
     };
@@ -41,6 +44,11 @@ export default function RealtimeStats() {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
         refreshCount('messages', 'messageCount');
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'site_stats' }, (payload) => {
+        if (payload.new && 'total_visitors' in payload.new) {
+           setStats(prev => ({ ...prev, visitorCount: (payload.new as any).total_visitors as number }));
+        }
       })
       .subscribe();
 
@@ -61,6 +69,7 @@ export default function RealtimeStats() {
       gap: '1.5rem',
       marginBottom: '3rem'
     }}>
+      <StatCard title="Total Visitors" value={stats.visitorCount} icon="👀" loading={loading} />
       <StatCard title="Total Users" value={stats.userCount} icon="👥" loading={loading} />
       <StatCard title="AI Personas" value={stats.personaCount} icon="🤖" loading={loading} />
       <StatCard title="Total Messages" value={stats.messageCount} icon="💬" loading={loading} />
