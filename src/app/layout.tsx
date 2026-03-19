@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 import { LanguageProvider } from "@/utils/i18n/LanguageContext";
+import PresenceTracker from "@/components/PresenceTracker";
 
 export const metadata: Metadata = {
   title: "Eternity AI - Preserve Memories Forever",
@@ -30,6 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LanguageProvider>
+          <PresenceTracker />
           {children}
         </LanguageProvider>
       </body>

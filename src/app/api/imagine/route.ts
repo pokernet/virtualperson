@@ -1,8 +1,39 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
 
 export async function POST(req: Request) {
   try {
     const { messages, personaName } = await req.json();
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // --- Start: Token Limit Check ---
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('openai_tokens, max_openai_tokens')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
+    }
+
+    const currentTokens = profile.openai_tokens || 0;
+    const maxTokens = profile.max_openai_tokens || 100000;
+    const IMAGE_COST = 5000; // Estimated cost for GPT-4o-mini + DALL-E 3
+
+    if (currentTokens + IMAGE_COST > maxTokens) {
+      return NextResponse.json({ 
+        error: 'Token limit exceeded', 
+        message: `Image generation requires ${IMAGE_COST} OpenAI tokens. You have ${maxTokens - currentTokens} remaining.` 
+      }, { status: 403 });
+    }
+    // --- End: Token Limit Check ---
 
     if (!messages || messages.length === 0) {
       return NextResponse.json({ error: 'No messages provided' }, { status: 400 });
@@ -57,6 +88,12 @@ export async function POST(req: Request) {
       console.error('Image Gen Error:', imageData.error);
       return NextResponse.json({ error: imageData.error.message }, { status: 500 });
     }
+
+    // Update token usage
+    await supabase
+      .from('profiles')
+      .update({ openai_tokens: currentTokens + IMAGE_COST })
+      .eq('id', user.id);
 
     return NextResponse.json({ imageUrl: imageData.data[0].url, prompt: generatedPrompt });
   } catch (error: any) {

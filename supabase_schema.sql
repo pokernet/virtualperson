@@ -10,6 +10,9 @@ create table if not exists public.profiles (
   openai_tokens bigint default 0,
   anthropic_tokens bigint default 0,
   local_tokens bigint default 0,
+  max_openai_tokens bigint default 100000, -- Default limit
+  max_anthropic_tokens bigint default 100000, -- Default limit
+  max_local_tokens bigint default 100000, -- Default limit
   account_status text default 'Active'
 );
 
@@ -73,8 +76,8 @@ create policy "Users can insert messages to their chats." on public.messages for
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url, openai_tokens, anthropic_tokens, local_tokens, account_status)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url', 0, 0, 0, 'Active');
+  insert into public.profiles (id, full_name, avatar_url, openai_tokens, anthropic_tokens, local_tokens, max_openai_tokens, max_anthropic_tokens, max_local_tokens, account_status)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url', 0, 0, 0, 100000, 100000, 100000, 'Active');
   return new;
 end;
 $$ language plpgsql security definer;
@@ -143,3 +146,15 @@ create policy "Memorial photos are publicly accessible." on storage.objects for 
 create policy "Anyone can upload to memorials." on storage.objects for insert with check (bucket_id = 'memorials');
 create policy "Anyone can update their own memorial photos." on storage.objects for update using (bucket_id = 'memorials' and auth.uid() = owner);
 create policy "Anyone can delete their own memorial photos." on storage.objects for delete using (bucket_id = 'memorials' and auth.uid() = owner);
+
+-- 9. Global System Settings
+create table if not exists public.system_settings (
+  key text primary key,
+  value jsonb not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS for system_settings (Admin only, but for now we'll allow select for all)
+alter table public.system_settings enable row level security;
+create policy "System settings are viewable by everyone." on public.system_settings for select using (true);
+-- We will restrict update/insert via server-side checks in the admin actions

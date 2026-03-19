@@ -48,6 +48,34 @@ export async function POST(req: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
+  // --- Start: Token Limit Check ---
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('openai_tokens, anthropic_tokens, local_tokens, max_openai_tokens, max_anthropic_tokens, max_local_tokens')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError || !profile) {
+    return new Response('User profile not found', { status: 404 });
+  }
+
+  const modelType = modelPref === 'anthropic' ? 'anthropic' : 
+                   modelPref === 'local' ? 'local' : 'openai';
+  
+  const currentTokens = profile[`${modelType}_tokens` as keyof typeof profile] as number || 0;
+  const maxTokens = profile[`max_${modelType}_tokens` as keyof typeof profile] as number || 100000;
+
+  if (currentTokens >= maxTokens) {
+    return new Response(JSON.stringify({ 
+      error: 'Token limit exceeded', 
+      message: `You have reached your ${modelType} token limit (${maxTokens}). Please contact an administrator.` 
+    }), { 
+      status: 403,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  // --- End: Token Limit Check ---
+
   // Normalize messages for the AI model: ensure each has a 'content' string
   const normalizedMessages = messages.map((m: any) => {
     if (m.content) return m;
@@ -95,18 +123,15 @@ export async function POST(req: Request) {
 
       // --- Token Tracking Enhancement ---
       if (event.usage) {
-        const { totalTokens } = event.usage;
+        const totalTokens = event.usage.totalTokens || 0;
         const column = modelPref === 'anthropic' ? 'anthropic_tokens' : 
                       modelPref === 'local' ? 'local_tokens' : 'openai_tokens';
 
         const { error: updateError } = await supabase
           .from('profiles')
-          .update({ [column]: totalTokens }) // This should ideally be an increment, but for simplicity we set it or use an RPC
+          .update({ [column]: currentTokens + totalTokens })
           .eq('id', user.id);
         
-        // Alternatively, use an RPC for atomic increment to avoid race conditions
-        // await supabase.rpc('increment_tokens', { user_id: user.id, provider: column, amount: totalTokens });
-
         if (updateError) {
           console.error('Error updating token usage:', updateError);
         }
