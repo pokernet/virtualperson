@@ -127,7 +127,19 @@ export default function DashboardClient({
               borderWidth: '2px',
               transition: 'all 0.2s',
               cursor: 'pointer',
-              textAlign: 'center'
+              textAlign: 'center',
+              textDecoration: 'none',
+              color: 'inherit'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-primary)';
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(129, 140, 248, 0.1)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-color)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
             }}>
               <div style={{
                 fontSize: '2.5rem',
@@ -148,9 +160,19 @@ export default function DashboardClient({
                 padding: '1.5rem',
                 borderRadius: '16px',
                 minHeight: '220px',
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                transition: 'all 0.2s',
                 position: 'relative',
                 textAlign: isRTL ? 'right' : 'left'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';
+                e.currentTarget.style.borderColor = 'var(--border-highlight)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+                e.currentTarget.style.borderColor = 'var(--surface-glass-border)';
               }}>
                 <Link href={`/chat/${persona.id}`} className="persona-card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div className="persona-avatar-wrapper" style={{ 

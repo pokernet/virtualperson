@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   description: "Connect with the digital embodiment of your loved ones.",
 };
 
+import { Suspense } from "react";
+import LoadingBar from "@/components/LoadingBar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +35,9 @@ export default function RootLayout({
       >
         <LanguageProvider>
           <PresenceTracker />
+          <Suspense fallback={null}>
+            <LoadingBar />
+          </Suspense>
           {children}
         </LanguageProvider>
       </body>

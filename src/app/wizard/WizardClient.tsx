@@ -287,7 +287,7 @@ export default function WizardClient({
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="btn-primary" 
+            className={`btn-primary ${isSubmitting ? 'btn-loading' : ''}`} 
             style={{ 
                 marginTop: '1rem', 
                 padding: '1rem',
@@ -298,22 +298,12 @@ export default function WizardClient({
                 flexDirection: isRTL ? 'row-reverse' : 'row'
             }}
           >
-            {isSubmitting ? (
-              <>
-                <div className="spinner" style={{ width: '20px', height: '20px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                {t('common.saving')}
-              </>
-            ) : (
-              isEditing ? t('wizard.submitEdit') : t('wizard.submitCreate')
-            )}
+            {isSubmitting 
+              ? t('common.saving') 
+              : (isEditing ? t('wizard.submitEdit') : t('wizard.submitCreate'))}
           </button>
         </form>
       </main>
-      <style jsx>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   )
 }

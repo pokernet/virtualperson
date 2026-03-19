@@ -366,7 +366,7 @@ export default function ChatInterface({
             <button 
                 onClick={handleVisualize}
                 disabled={isVisualizing || messages.length === 0}
-                className="btn-secondary"
+                className={`btn-secondary ${isVisualizing ? 'btn-loading' : ''}`}
                 style={{ 
                     fontSize: '0.8rem', 
                     padding: '0.5rem 1rem',
@@ -408,7 +408,11 @@ export default function ChatInterface({
               textAlign: 'inherit'
             }}
           />
-          <button type="submit" disabled={isLoading || !input.trim()} className="btn-primary" style={{
+          <button 
+            type="submit" 
+            disabled={isLoading || !input.trim()} 
+            className={`btn-primary ${isLoading ? 'btn-loading' : ''}`} 
+            style={{
             borderRadius: '50%',
             width: '56px',
             height: '56px',
